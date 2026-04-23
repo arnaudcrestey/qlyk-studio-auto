@@ -2,11 +2,11 @@ import Link from 'next/link';
 import { CarFront, Menu } from 'lucide-react';
 
 const links = [
-  { href: '/', label: 'Accueil' },
-  { href: '/exemples', label: 'Exemples' },
-  { href: '/offres', label: 'Offres' },
-  { href: '/deposer-un-vehicule', label: 'Déposer un véhicule' },
-  { href: '/contact', label: 'Contact' }
+  { label: "Accueil", href: "/" as const },
+  { label: "Exemples", href: "/exemples" as const },
+  { label: "Offres", href: "/offres" as const },
+  { label: "Déposer un véhicule", href: "/deposer-un-vehicule" as const },
+  { label: "Contact", href: "/contact" as const },
 ];
 
 export function SiteHeader() {

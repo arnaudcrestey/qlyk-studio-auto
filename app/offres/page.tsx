@@ -8,7 +8,8 @@ const offers = [
     badge: 'Pour tester',
     price: '39€',
     priceNote: 'HT / véhicule',
-    description: 'Tester la qualité Qlyk sur un premier véhicule avec un visuel prêt à vendre.',
+    description:
+      'Tester la qualité Qlyk sur un premier véhicule avec un visuel prêt à vendre.',
     items: [
       '1 photo envoyée',
       '1 visuel premium optimisé',
@@ -28,7 +29,7 @@ const offers = [
     items: [
       '1 véhicule',
       '3 visuels complémentaires',
-      '3 usages commerciaux différents',
+      'annonce principale, réseaux sociaux, image premium',
       'cohérence visuelle renforcée'
     ],
     note:
@@ -39,8 +40,8 @@ const offers = [
   {
     title: 'Concession',
     badge: 'Sur mesure',
-    price: 'Sur devis',
-    priceNote: 'selon volume',
+    price: 'Offre sur mesure',
+    priceNote: 'devis personnalisé',
     description:
       'Mettre en place une production régulière et homogène pour valoriser l’ensemble de votre parc.',
     items: [
@@ -60,12 +61,12 @@ const steps = [
     text: 'Une photo claire du véhicule suffit pour démarrer.'
   },
   {
-    title: 'Nous cadrons le besoin',
+    title: 'Nous définissons les mises en scène',
     text: 'Essentiel : 1 mise en scène. Pro : 3 visuels complémentaires adaptés au véhicule.'
   },
   {
     title: 'Nous créons vos visuels',
-    text: 'Le véhicule reste fidèle : forme, couleur, jantes et proportions sont conservées.'
+    text: 'Le véhicule reste strictement fidèle : forme, couleur, jantes et proportions sont conservées.'
   },
   {
     title: 'Vous recevez le résultat',
@@ -121,9 +122,16 @@ export default function OffresPage() {
                 </h2>
 
                 <div className="mt-5">
-                  <p className="font-serif text-4xl leading-none sm:text-5xl">
+                  <p
+                    className={`font-serif leading-none ${
+                      offer.title === 'Concession'
+                        ? 'text-3xl sm:text-4xl'
+                        : 'text-4xl sm:text-5xl'
+                    }`}
+                  >
                     {offer.price}
                   </p>
+
                   <p className="mt-2 text-xs uppercase tracking-[0.18em] text-foreground/45">
                     {offer.priceNote}
                   </p>
@@ -186,7 +194,7 @@ export default function OffresPage() {
         </div>
 
         <div className="mx-auto mt-10 max-w-3xl text-center text-sm leading-relaxed text-foreground/45">
-          Les priX indiqués concernent la création de visuels à partir de photos fournies.
+          Les prix indiqués concernent la création de visuels à partir de photos fournies.
           Les demandes spécifiques, volumes importants ou besoins récurrents font l’objet d’un devis.
         </div>
       </div>

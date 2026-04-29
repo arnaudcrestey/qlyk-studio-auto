@@ -186,7 +186,7 @@ export default function OffresPage() {
         </div>
 
         <div className="mx-auto mt-10 max-w-3xl text-center text-sm leading-relaxed text-foreground/45">
-          Les prix indiqués concernent la création de visuels à partir de photos fournies.
+          Les priX indiqués concernent la création de visuels à partir de photos fournies.
           Les demandes spécifiques, volumes importants ou besoins récurrents font l’objet d’un devis.
         </div>
       </div>

@@ -19,21 +19,25 @@ export type ContactInput = z.infer<typeof contactSchema>;
 
 /**
  * =========================
- * DEPOT VEHICULE
+ * DEPOT VEHICULE (COMPLET)
  * =========================
  */
 
 export const vehicleDepositSchema = z.object({
-  firstName: z.string().min(2, 'Prénom requis'),
-  lastName: z.string().min(2, 'Nom requis'),
-  email: z.string().email('Email invalide'),
+  firstName: z.string().min(2),
+  lastName: z.string().min(2),
+  email: z.string().email(),
   phone: z.string().optional(),
 
-  garageName: z.string().optional(),
+  // Garage
+  dealership: z.string().optional(),
 
-  brandModel: z.string().min(2, 'Marque et modèle requis'),
-  vehicleModel: z.string().optional(),
+  // Véhicule
+  vehicleType: z.string().optional(),
+  brandModel: z.string().min(2),
+  year: z.string().optional(),
 
+  // Style
   style: z
     .enum(['exterieur', 'showroom', 'lifestyle', 'concession'])
     .optional(),
@@ -43,5 +47,8 @@ export const vehicleDepositSchema = z.object({
 
 export type VehicleDepositInput = z.infer<typeof vehicleDepositSchema>;
 
+/**
+ * Alias sécurité
+ */
 export const depotSchema = vehicleDepositSchema;
 export type DepotInput = VehicleDepositInput;

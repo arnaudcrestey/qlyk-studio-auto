@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useMemo, useState } from 'react';
+import { UploadDropzone } from '@/lib/uploadthing';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
@@ -8,6 +9,12 @@ import { Textarea } from '@/components/ui/textarea';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 type Offer = 'essentiel' | 'pro' | 'concession';
+
+type UploadedFile = {
+  name: string;
+  url: string;
+  size?: number;
+};
 
 const offerOptions = [
   {
@@ -25,7 +32,7 @@ const offerOptions = [
     label: 'Concession — sur devis',
     description: 'Production régulière pour plusieurs véhicules.'
   }
-];
+] as const;
 
 const stagingOptions = [
   'Concession réaliste',
@@ -39,6 +46,7 @@ export function VehicleDepositForm() {
   const [status, setStatus] = useState<Status>('idle');
   const [message, setMessage] = useState('');
   const [selectedOffer, setSelectedOffer] = useState<Offer>('essentiel');
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
 
   const currentOffer = useMemo(
     () => offerOptions.find((offer) => offer.value === selectedOffer),
@@ -50,8 +58,18 @@ export function VehicleDepositForm() {
     setStatus('loading');
     setMessage('');
 
+    if (uploadedFiles.length === 0) {
+      setStatus('error');
+      setMessage('Ajoutez au moins une photo du véhicule avant d’envoyer.');
+      return;
+    }
+
     const formData = new FormData(event.currentTarget);
-    const payload = Object.fromEntries(formData.entries());
+
+    const payload = {
+      ...Object.fromEntries(formData.entries()),
+      uploadedFiles
+    };
 
     try {
       const response = await fetch('/api/depot-vehicule', {
@@ -77,6 +95,7 @@ export function VehicleDepositForm() {
 
       event.currentTarget.reset();
       setSelectedOffer('essentiel');
+      setUploadedFiles([]);
     } catch {
       setStatus('error');
       setMessage('Service indisponible, veuillez réessayer.');
@@ -111,7 +130,7 @@ export function VehicleDepositForm() {
                   name="offer"
                   value={offer.value}
                   checked={active}
-                  onChange={() => setSelectedOffer(offer.value as Offer)}
+                  onChange={() => setSelectedOffer(offer.value)}
                   className="sr-only"
                 />
 
@@ -182,13 +201,64 @@ export function VehicleDepositForm() {
         />
       </div>
 
-      <div className="mt-4">
-        <Input
-          name="photosLink"
-          type="url"
-          placeholder="Lien photos public : Google Drive, WeTransfer, Dropbox..."
-          required
+      <div className="mt-6 rounded-3xl border border-white/10 bg-black/20 p-4 sm:p-5">
+        <div className="mb-4">
+          <p className="text-sm font-semibold text-foreground">
+            Photos du véhicule
+          </p>
+          <p className="mt-1 text-sm leading-relaxed text-foreground/55">
+            Ajoutez 1 à 6 photos. Formats image acceptés. Taille maximale : 8 Mo par fichier.
+          </p>
+        </div>
+
+        <UploadDropzone
+          endpoint="vehiclePhotos"
+          onClientUploadComplete={(res) => {
+            const files = res.map((file) => ({
+              name: file.name,
+              url: file.url,
+              size: file.size
+            }));
+
+            setUploadedFiles(files);
+            setStatus('idle');
+            setMessage('');
+          }}
+          onUploadError={(error: Error) => {
+            setStatus('error');
+            setMessage(error.message || 'Erreur pendant l’envoi des photos.');
+          }}
+          appearance={{
+            container:
+              'rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition hover:border-premium/40',
+            label: 'text-foreground font-medium',
+            allowedContent: 'text-foreground/45 text-sm',
+            button:
+              'rounded-full bg-premium px-5 py-2 text-sm font-medium text-white ut-readying:bg-premium/70 ut-uploading:bg-premium/70'
+          }}
+          content={{
+            label: 'Glissez vos photos ici ou cliquez pour sélectionner',
+            allowedContent: 'Images uniquement — jusqu’à 6 fichiers de 8 Mo'
+          }}
         />
+
+        {uploadedFiles.length > 0 ? (
+          <div className="mt-4 rounded-2xl border border-green-400/20 bg-green-400/10 p-4">
+            <p className="text-sm font-medium text-green-300">
+              {uploadedFiles.length} photo
+              {uploadedFiles.length > 1 ? 's' : ''} ajoutée
+              {uploadedFiles.length > 1 ? 's' : ''}
+            </p>
+
+            <ul className="mt-3 space-y-2 text-sm text-foreground/70">
+              {uploadedFiles.map((file) => (
+                <li key={file.url} className="truncate">
+                  {file.name}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
       </div>
 
       <div className="mt-7 flex flex-col gap-4 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">

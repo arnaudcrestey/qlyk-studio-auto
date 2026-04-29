@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { CheckCircle2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 export default function DepotVehiculeSuccesPage() {
   return (
@@ -21,17 +20,19 @@ export default function DepotVehiculeSuccesPage() {
           </p>
 
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <Button asChild className="rounded-full px-7">
-              <Link href="/">
-                Retour à l’accueil
-              </Link>
-            </Button>
+            <Link
+              href="/"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-premium px-7 text-sm font-medium text-white transition hover:bg-premium/90"
+            >
+              Retour à l’accueil
+            </Link>
 
-            <Button asChild variant="outline" className="rounded-full px-7">
-              <Link href="/deposer-un-vehicule">
-                Déposer un autre véhicule
-              </Link>
-            </Button>
+            <Link
+              href="/deposer-un-vehicule"
+              className="inline-flex h-12 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] px-7 text-sm font-medium text-foreground transition hover:border-premium/40 hover:bg-premium/10"
+            >
+              Déposer un autre véhicule
+            </Link>
           </div>
         </div>
       </div>

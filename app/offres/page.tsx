@@ -6,34 +6,71 @@ const offers = [
   {
     title: 'Essentiel',
     badge: 'Pour tester',
-    description: 'Tester la qualité Qlyk sur un premier véhicule.',
-    items: ['1 photo envoyée', '1 visuel premium optimisé', '1 décor au choix'],
+    price: '39€',
+    priceNote: 'HT / véhicule',
+    description: 'Tester la qualité Qlyk sur un premier véhicule avec un visuel prêt à vendre.',
+    items: [
+      '1 photo envoyée',
+      '1 visuel premium optimisé',
+      '1 mise en scène au choix',
+      'livraison du visuel final'
+    ],
     cta: 'Tester avec mon véhicule',
     highlight: false
   },
   {
     title: 'Pro',
     badge: 'Recommandé',
-    description: 'Créer plusieurs visuels cohérents pour mieux présenter une annonce.',
-    items: ['1 véhicule', '3 styles visuels', 'cohérence visuelle renforcée'],
+    price: '89€',
+    priceNote: 'HT / véhicule',
+    description:
+      'Créer plusieurs visuels complémentaires du même véhicule pour mieux valoriser une annonce.',
+    items: [
+      '1 véhicule',
+      '3 visuels complémentaires',
+      '3 usages commerciaux différents',
+      'cohérence visuelle renforcée'
+    ],
+    note:
+      'Idéal pour disposer d’un visuel principal, d’une variante de mise en avant et d’une image premium.',
     cta: 'Créer mes visuels',
     highlight: true
   },
   {
     title: 'Concession',
     badge: 'Sur mesure',
-    description: 'Mettre en place une production régulière pour tout votre parc.',
-    items: ['volume mensuel', 'homogénéité du parc', 'priorité & suivi'],
+    price: 'Sur devis',
+    priceNote: 'selon volume',
+    description:
+      'Mettre en place une production régulière et homogène pour valoriser l’ensemble de votre parc.',
+    items: [
+      'volume mensuel',
+      'homogénéité du parc',
+      'priorité de traitement',
+      'suivi personnalisé'
+    ],
     cta: 'Mettre en place le système',
     highlight: false
   }
 ];
 
 const steps = [
-  'Vous envoyez une photo',
-  'Vous choisissez un style',
-  'On crée votre visuel',
-  'Vous recevez le résultat'
+  {
+    title: 'Vous envoyez votre photo',
+    text: 'Une photo claire du véhicule suffit pour démarrer.'
+  },
+  {
+    title: 'Nous cadrons le besoin',
+    text: 'Essentiel : 1 mise en scène. Pro : 3 visuels complémentaires adaptés au véhicule.'
+  },
+  {
+    title: 'Nous créons vos visuels',
+    text: 'Le véhicule reste fidèle : forme, couleur, jantes et proportions sont conservées.'
+  },
+  {
+    title: 'Vous recevez le résultat',
+    text: 'Des visuels prêts à utiliser pour vos annonces, votre site ou vos supports commerciaux.'
+  }
 ];
 
 export default function OffresPage() {
@@ -50,11 +87,11 @@ export default function OffresPage() {
           </h1>
 
           <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-foreground/75 sm:text-lg">
-            Une approche simple pour transformer vos photos véhicules en visuels premium prêts à vendre.
+            Des visuels automobiles premium prêts à vendre, sans modifier le véhicule.
           </p>
 
           <p className="mt-3 text-sm text-foreground/50">
-            Offres adaptées sur devis selon le volume et le besoin.
+            Prix affichés hors taxes. Sans abonnement pour les offres Essentiel et Pro.
           </p>
         </div>
 
@@ -62,7 +99,7 @@ export default function OffresPage() {
           {offers.map((offer) => (
             <Card
               key={offer.title}
-              className={`relative flex min-h-[330px] flex-col justify-between rounded-3xl p-6 sm:p-8 transition-all duration-300 ${
+              className={`relative flex min-h-[430px] flex-col justify-between rounded-3xl p-6 sm:p-8 transition-all duration-300 ${
                 offer.highlight
                   ? 'border-premium/70 bg-premium/10 shadow-[0_0_45px_rgba(37,99,235,0.35)] lg:-translate-y-3'
                   : 'border-white/10 bg-white/[0.03]'
@@ -83,7 +120,16 @@ export default function OffresPage() {
                   {offer.title}
                 </h2>
 
-                <p className="mt-4 text-sm leading-relaxed text-foreground/65 sm:text-base">
+                <div className="mt-5">
+                  <p className="font-serif text-4xl leading-none sm:text-5xl">
+                    {offer.price}
+                  </p>
+                  <p className="mt-2 text-xs uppercase tracking-[0.18em] text-foreground/45">
+                    {offer.priceNote}
+                  </p>
+                </div>
+
+                <p className="mt-5 text-sm leading-relaxed text-foreground/65 sm:text-base">
                   {offer.description}
                 </p>
 
@@ -95,6 +141,12 @@ export default function OffresPage() {
                     </li>
                   ))}
                 </ul>
+
+                {'note' in offer && offer.note && (
+                  <p className="mt-5 rounded-2xl border border-premium/20 bg-premium/10 p-4 text-sm leading-relaxed text-foreground/70">
+                    {offer.note}
+                  </p>
+                )}
               </div>
 
               <Link href="/deposer-un-vehicule" className="mt-8 block">
@@ -114,19 +166,28 @@ export default function OffresPage() {
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {steps.map((step, index) => (
               <div
-                key={step}
+                key={step.title}
                 className="rounded-2xl border border-white/10 bg-black/20 p-5 text-left sm:text-center"
               >
                 <div className="mb-4 flex h-8 w-8 items-center justify-center rounded-full bg-premium/15 text-sm font-semibold text-premium sm:mx-auto">
                   {index + 1}
                 </div>
 
-                <p className="text-sm leading-relaxed text-foreground/75 sm:text-base">
-                  {step}
+                <h4 className="text-sm font-semibold leading-snug text-foreground sm:text-base">
+                  {step.title}
+                </h4>
+
+                <p className="mt-3 text-sm leading-relaxed text-foreground/60">
+                  {step.text}
                 </p>
               </div>
             ))}
           </div>
+        </div>
+
+        <div className="mx-auto mt-10 max-w-3xl text-center text-sm leading-relaxed text-foreground/45">
+          Les prix indiqués concernent la création de visuels à partir de photos fournies.
+          Les demandes spécifiques, volumes importants ou besoins récurrents font l’objet d’un devis.
         </div>
       </div>
     </section>

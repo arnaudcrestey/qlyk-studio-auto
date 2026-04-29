@@ -8,7 +8,6 @@ const links = [
   { label: 'Accueil', href: '/' as const },
   { label: 'Exemples', href: '/exemples' as const },
   { label: 'Offres', href: '/offres' as const },
-  { label: 'Déposer un véhicule', href: '/deposer-un-vehicule' as const },
   { label: 'Contact', href: '/contact' as const },
 ];
 

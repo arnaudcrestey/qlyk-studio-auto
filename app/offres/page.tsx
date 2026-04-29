@@ -50,8 +50,7 @@ export default function OffresPage() {
           </h1>
 
           <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-foreground/75 sm:text-lg">
-            Une approche simple pour transformer vos photos véhicules en visuels
-            premium prêts à vendre.
+            Une approche simple pour transformer vos photos véhicules en visuels premium prêts à vendre.
           </p>
 
           <p className="mt-3 text-sm text-foreground/50">
@@ -98,7 +97,7 @@ export default function OffresPage() {
                 </ul>
               </div>
 
-              <Link href="/depot" className="mt-8 block">
+              <Link href="/depot-vehicule" className="mt-8 block">
                 <Button className="h-12 w-full rounded-full text-sm font-medium sm:text-base">
                   {offer.cta}
                 </Button>

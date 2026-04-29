@@ -16,33 +16,33 @@ export default function HomePage() {
       <ProcessSection />
 
       <section className="relative overflow-hidden border-t border-white/10 bg-[#070707]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.12),transparent_38%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(37,99,235,0.12),transparent_42%)]" />
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
-        <div className="container-premium relative py-20 text-center sm:py-24 lg:py-28">
-          <div className="mx-auto max-w-3xl">
-            <p className="mb-5 text-xs font-medium uppercase tracking-[0.35em] text-blue-400/80">
+        <div className="container-premium relative px-5 py-16 text-center sm:py-20 lg:py-24">
+          <div className="mx-auto max-w-[760px]">
+            <p className="mb-4 text-[0.68rem] font-medium uppercase tracking-[0.32em] text-blue-400/80 sm:text-xs">
               Dépôt véhicule
             </p>
 
-            <h2 className="font-serif text-[2.15rem] leading-[1.08] tracking-[-0.03em] text-white sm:text-5xl lg:text-6xl">
+            <h2 className="mx-auto max-w-[720px] font-serif text-[2.35rem] leading-[1.05] tracking-[-0.04em] text-white sm:text-5xl lg:text-[4rem]">
               Prêt à valoriser votre stock automobile&nbsp;?
             </h2>
 
-            <p className="mx-auto mt-6 max-w-xl text-base leading-7 text-white/70 sm:text-lg">
+            <p className="mx-auto mt-6 max-w-[620px] text-[1.05rem] leading-8 text-white/68 sm:text-lg">
               Déposez un véhicule et recevez un rendu premium fidèle, sans aucune
               modification du véhicule.
             </p>
 
-            <div className="mt-10 flex justify-center">
+            <div className="mt-9 flex justify-center">
               <Link href="/deposer-un-vehicule">
-                <Button className="h-12 rounded-full bg-blue-600 px-7 text-sm font-semibold text-white shadow-[0_0_40px_rgba(37,99,235,0.35)] transition hover:bg-blue-500 sm:h-13 sm:px-9">
+                <Button className="h-12 rounded-full bg-blue-600 px-8 text-sm font-semibold text-white shadow-[0_0_35px_rgba(37,99,235,0.32)] transition hover:bg-blue-500 sm:h-12 sm:px-9">
                   Déposer un véhicule
                 </Button>
               </Link>
             </div>
 
-            <p className="mx-auto mt-6 max-w-md text-xs leading-5 text-white/40">
+            <p className="mx-auto mt-6 max-w-[520px] text-xs leading-5 text-white/38 sm:text-[0.8rem]">
               Véhicule conservé strictement à l’identique : carrosserie, couleur,
               jantes et proportions.
             </p>

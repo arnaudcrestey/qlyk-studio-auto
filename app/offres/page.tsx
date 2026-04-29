@@ -97,7 +97,7 @@ export default function OffresPage() {
                 </ul>
               </div>
 
-              <Link href="/depot-vehicule" className="mt-8 block">
+              <Link href="/deposer-un-vehicule" className="mt-8 block">
                 <Button className="h-12 w-full rounded-full text-sm font-medium sm:text-base">
                   {offer.cta}
                 </Button>

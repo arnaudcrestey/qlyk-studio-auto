@@ -29,10 +29,10 @@ export default function HomePage() {
               Prêt à valoriser votre stock automobile&nbsp;?
             </h2>
 
-            <p className="mx-auto mt-6 max-w-[560px] text-[1rem] leading-7 text-white/68 sm:text-lg sm:leading-8">
+            <p className="mx-auto mt-6 max-w-[460px] text-[1rem] leading-7 text-white/68 sm:max-w-[560px] sm:text-lg sm:leading-8">
               Déposez un véhicule et recevez un rendu premium fidèle,
-              <br className="hidden sm:block" />
-              sans aucune modification du véhicule.
+              <span className="whitespace-nowrap"> sans aucune modification</span>
+              <span className="whitespace-nowrap"> du véhicule.</span>
             </p>
 
             <div className="mt-9 flex justify-center">

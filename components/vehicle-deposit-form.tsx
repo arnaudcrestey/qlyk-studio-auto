@@ -1,6 +1,8 @@
 'use client';
 
 import { FormEvent, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { UploadCloud, X, CheckCircle2 } from 'lucide-react';
 import { UploadDropzone } from '@/lib/uploadthing';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -43,6 +45,8 @@ const stagingOptions = [
 ];
 
 export function VehicleDepositForm() {
+  const router = useRouter();
+
   const [status, setStatus] = useState<Status>('idle');
   const [message, setMessage] = useState('');
   const [selectedOffer, setSelectedOffer] = useState<Offer>('essentiel');
@@ -52,6 +56,19 @@ export function VehicleDepositForm() {
     () => offerOptions.find((offer) => offer.value === selectedOffer),
     [selectedOffer]
   );
+
+  function handleOfferChange(offer: Offer) {
+    if (offer === 'concession') {
+      router.push('/contact?objet=concession');
+      return;
+    }
+
+    setSelectedOffer(offer);
+  }
+
+  function removeFile(url: string) {
+    setUploadedFiles((files) => files.filter((file) => file.url !== url));
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -68,6 +85,7 @@ export function VehicleDepositForm() {
 
     const payload = {
       ...Object.fromEntries(formData.entries()),
+      offer: selectedOffer,
       uploadedFiles
     };
 
@@ -80,23 +98,15 @@ export function VehicleDepositForm() {
 
       const data = await response.json();
 
-      if (!response.ok) {
+      if (!response.ok || data.success !== true) {
         setStatus('error');
         setMessage(data.error ?? 'Erreur lors de l’envoi.');
         return;
       }
 
-      setStatus('success');
-      setMessage(
-        selectedOffer === 'concession'
-          ? 'Votre demande a bien été envoyée. Nous reviendrons vers vous avec une proposition adaptée.'
-          : 'Votre véhicule a bien été déposé. Vous allez recevoir les prochaines indications.'
-      );
-
-      event.currentTarget.reset();
-      setSelectedOffer('essentiel');
-      setUploadedFiles([]);
-    } catch {
+      router.push('/deposer-un-vehicule/succes');
+    } catch (error) {
+      console.error('DEPOT FORM ERROR:', error);
       setStatus('error');
       setMessage('Service indisponible, veuillez réessayer.');
     }
@@ -105,10 +115,10 @@ export function VehicleDepositForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="mx-auto w-full max-w-6xl rounded-3xl border border-white/10 bg-white/[0.035] p-5 shadow-[0_0_60px_rgba(37,99,235,0.12)] backdrop-blur sm:p-7 lg:p-8"
+      className="mx-auto w-full max-w-6xl rounded-3xl border border-white/10 bg-white/[0.035] p-5 shadow-[0_0_70px_rgba(37,99,235,0.14)] backdrop-blur sm:p-7 lg:p-8"
     >
-      <div className="mb-8 rounded-3xl border border-premium/20 bg-premium/10 p-5 sm:p-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-premium">
+      <div className="mb-8 rounded-3xl border border-premium/25 bg-premium/10 p-5 sm:p-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-premium">
           Offre souhaitée
         </p>
 
@@ -117,23 +127,16 @@ export function VehicleDepositForm() {
             const active = selectedOffer === offer.value;
 
             return (
-              <label
+              <button
                 key={offer.value}
-                className={`cursor-pointer rounded-2xl border p-4 transition-all duration-300 ${
+                type="button"
+                onClick={() => handleOfferChange(offer.value)}
+                className={`rounded-2xl border p-4 text-left transition-all duration-300 ${
                   active
                     ? 'border-premium bg-premium/15 shadow-[0_0_30px_rgba(37,99,235,0.22)]'
                     : 'border-white/10 bg-black/20 hover:border-premium/40 hover:bg-white/[0.04]'
                 }`}
               >
-                <input
-                  type="radio"
-                  name="offer"
-                  value={offer.value}
-                  checked={active}
-                  onChange={() => setSelectedOffer(offer.value)}
-                  className="sr-only"
-                />
-
                 <span className="block text-sm font-semibold text-foreground">
                   {offer.label}
                 </span>
@@ -141,7 +144,7 @@ export function VehicleDepositForm() {
                 <span className="mt-2 block text-sm leading-relaxed text-foreground/60">
                   {offer.description}
                 </span>
-              </label>
+              </button>
             );
           })}
         </div>
@@ -172,11 +175,7 @@ export function VehicleDepositForm() {
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <Input name="year" placeholder="Année" inputMode="numeric" required />
-        <Input
-          name="objective"
-          placeholder="Objectif principal : vendre, annoncer, valoriser..."
-          required
-        />
+        <Input name="objective" placeholder="Objectif : vendre, annoncer, valoriser..." required />
       </div>
 
       <div className="mt-4">
@@ -201,14 +200,20 @@ export function VehicleDepositForm() {
         />
       </div>
 
-      <div className="mt-6 rounded-3xl border border-white/10 bg-black/20 p-4 sm:p-5">
-        <div className="mb-4">
-          <p className="text-sm font-semibold text-foreground">
-            Photos du véhicule
-          </p>
-          <p className="mt-1 text-sm leading-relaxed text-foreground/55">
-            Ajoutez jusqu’à 3 photos du véhicule. Formats image acceptés. Taille maximale : 8 Mo par fichier.
-          </p>
+      <div className="mt-6 rounded-3xl border border-white/10 bg-black/25 p-4 sm:p-5">
+        <div className="mb-4 flex items-start gap-3">
+          <div className="rounded-2xl border border-premium/25 bg-premium/10 p-3 text-premium">
+            <UploadCloud size={22} />
+          </div>
+
+          <div>
+            <p className="text-sm font-semibold text-foreground">
+              Photos du véhicule
+            </p>
+            <p className="mt-1 text-sm leading-relaxed text-foreground/55">
+              Ajoutez jusqu’à 3 photos. Vous pourrez les vérifier avant l’envoi.
+            </p>
+          </div>
         </div>
 
         <UploadDropzone
@@ -234,7 +239,7 @@ export function VehicleDepositForm() {
           }}
           appearance={{
             container:
-              'rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition hover:border-premium/40',
+              'rounded-3xl border border-dashed border-white/15 bg-white/[0.03] p-8 transition hover:border-premium/50 hover:bg-premium/[0.04]',
             label: 'text-foreground font-medium',
             allowedContent: 'text-foreground/45 text-sm',
             button:
@@ -246,23 +251,46 @@ export function VehicleDepositForm() {
           }}
         />
 
-        {uploadedFiles.length > 0 ? (
-          <div className="mt-4 rounded-2xl border border-green-400/20 bg-green-400/10 p-4">
-            <p className="text-sm font-medium text-green-300">
-              {uploadedFiles.length} photo
-              {uploadedFiles.length > 1 ? 's' : ''} ajoutée
-              {uploadedFiles.length > 1 ? 's' : ''}
-            </p>
+        {uploadedFiles.length > 0 && (
+          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {uploadedFiles.map((file, index) => (
+              <div
+                key={file.url}
+                className="group overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04]"
+              >
+                <div className="relative aspect-[4/3] overflow-hidden bg-black">
+                  <img
+                    src={file.url}
+                    alt={file.name}
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                  />
 
-            <ul className="mt-3 space-y-2 text-sm text-foreground/70">
-              {uploadedFiles.map((file) => (
-                <li key={file.url} className="truncate">
-                  {file.name}
-                </li>
-              ))}
-            </ul>
+                  <button
+                    type="button"
+                    onClick={() => removeFile(file.url)}
+                    className="absolute right-3 top-3 rounded-full bg-black/70 p-2 text-white backdrop-blur transition hover:bg-red-500"
+                    aria-label="Supprimer la photo"
+                  >
+                    <X size={16} />
+                  </button>
+
+                  <div className="absolute left-3 top-3 rounded-full bg-green-400/90 px-3 py-1 text-xs font-semibold text-black">
+                    Photo {index + 1}
+                  </div>
+                </div>
+
+                <div className="p-4">
+                  <p className="truncate text-sm font-medium text-foreground">
+                    {file.name}
+                  </p>
+                  <p className="mt-1 text-xs text-foreground/45">
+                    Photo chargée avec succès
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
-        ) : null}
+        )}
       </div>
 
       <div className="mt-7 flex flex-col gap-4 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
@@ -280,15 +308,11 @@ export function VehicleDepositForm() {
           type="submit"
           className="h-12 rounded-full px-8 text-sm font-medium sm:min-w-[240px]"
         >
-          {status === 'loading'
-            ? 'Envoi en cours...'
-            : selectedOffer === 'concession'
-              ? 'Envoyer ma demande'
-              : 'Continuer avec cette offre'}
+          {status === 'loading' ? 'Envoi en cours...' : 'Continuer avec cette offre'}
         </Button>
       </div>
 
-      {message ? (
+      {message && (
         <p
           className={`mt-5 rounded-2xl border px-4 py-3 text-sm ${
             status === 'success'
@@ -299,7 +323,7 @@ export function VehicleDepositForm() {
         >
           {message}
         </p>
-      ) : null}
+      )}
     </form>
   );
 }

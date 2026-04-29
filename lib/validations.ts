@@ -1,11 +1,8 @@
 import { z } from 'zod';
 
 /**
- * =========================
  * CONTACT
- * =========================
  */
-
 export const contactSchema = z.object({
   firstName: z.string().min(2, 'Prénom requis'),
   lastName: z.string().min(2, 'Nom requis'),
@@ -18,26 +15,27 @@ export const contactSchema = z.object({
 export type ContactInput = z.infer<typeof contactSchema>;
 
 /**
- * =========================
- * DEPOT VEHICULE (COMPLET)
- * =========================
+ * DEPOT VEHICULE
  */
-
 export const vehicleDepositSchema = z.object({
-  firstName: z.string().min(2),
-  lastName: z.string().min(2),
-  email: z.string().email(),
+  firstName: z.string().min(2, 'Prénom requis'),
+  lastName: z.string().min(2, 'Nom requis'),
+  email: z.string().email('Email invalide'),
   phone: z.string().optional(),
 
-  // Garage
   dealership: z.string().optional(),
+  garageName: z.string().optional(),
+  company: z.string().optional(),
 
-  // Véhicule
   vehicleType: z.string().optional(),
-  brandModel: z.string().min(2),
+  brandModel: z.string().min(2, 'Marque / modèle requis'),
+  vehicleModel: z.string().optional(),
   year: z.string().optional(),
 
-  // Style
+  objective: z.string().optional(),
+  requestedStyle: z.string().optional(),
+  photosLink: z.string().optional(),
+
   style: z
     .enum(['exterieur', 'showroom', 'lifestyle', 'concession'])
     .optional(),
@@ -48,7 +46,7 @@ export const vehicleDepositSchema = z.object({
 export type VehicleDepositInput = z.infer<typeof vehicleDepositSchema>;
 
 /**
- * Alias sécurité
+ * ALIAS DE COMPATIBILITÉ
  */
 export const depotSchema = vehicleDepositSchema;
 export type DepotInput = VehicleDepositInput;

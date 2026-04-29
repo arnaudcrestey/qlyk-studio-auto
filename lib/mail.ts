@@ -1,14 +1,23 @@
 import nodemailer from 'nodemailer';
 
+const smtpHost = process.env.SMTP_HOST;
 const smtpPort = Number(process.env.SMTP_PORT ?? 587);
+const smtpUser = process.env.SMTP_USER;
+const smtpPass = process.env.SMTP_PASS;
+const mailFrom = process.env.MAIL_FROM;
 
-export const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
+if (!smtpHost) throw new Error('SMTP_HOST manquant.');
+if (!smtpUser) throw new Error('SMTP_USER manquant.');
+if (!smtpPass) throw new Error('SMTP_PASS manquant.');
+if (!mailFrom) throw new Error('MAIL_FROM manquant.');
+
+const transporter = nodemailer.createTransport({
+  host: smtpHost,
   port: smtpPort,
   secure: smtpPort === 465,
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
+    user: smtpUser,
+    pass: smtpPass
   }
 });
 
@@ -18,17 +27,16 @@ export async function sendMail(params: {
   text: string;
   html: string;
 }) {
-  const from = process.env.MAIL_FROM;
-
-  if (!from) {
-    throw new Error('MAIL_FROM manquant dans les variables d\'environnement.');
+  try {
+    await transporter.sendMail({
+      from: mailFrom,
+      to: params.to,
+      subject: params.subject,
+      text: params.text,
+      html: params.html
+    });
+  } catch (error) {
+    console.error('SENDMAIL ERROR:', error);
+    throw error;
   }
-
-  await transporter.sendMail({
-    from,
-    to: params.to,
-    subject: params.subject,
-    text: params.text,
-    html: params.html
-  });
 }

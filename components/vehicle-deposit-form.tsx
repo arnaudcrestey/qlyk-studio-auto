@@ -2,7 +2,7 @@
 
 import { FormEvent, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { UploadCloud, X, CheckCircle2 } from 'lucide-react';
+import { UploadCloud, X } from 'lucide-react';
 import { UploadDropzone } from '@/lib/uploadthing';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

@@ -2,18 +2,21 @@ import { NextResponse } from 'next/server';
 import { sendMail } from '@/lib/mail';
 import { vehicleDepositSchema } from '@/lib/validations';
 
-type UploadedFile = {
-  name: string;
-  url: string;
-  size?: number;
-};
+export const runtime = 'nodejs';
+
+function clean(value?: string) {
+  return value && value.trim() !== '' ? value : 'Non renseigné';
+}
 
 export async function POST(request: Request) {
   try {
     const json = await request.json();
+
     const parsed = vehicleDepositSchema.safeParse(json);
 
     if (!parsed.success) {
+      console.error('VALIDATION ERROR:', parsed.error.flatten().fieldErrors);
+
       return NextResponse.json(
         {
           error: 'Validation invalide',
@@ -27,13 +30,15 @@ export async function POST(request: Request) {
     const recipient = process.env.MAIL_TO;
 
     if (!recipient) {
+      console.error('MAIL_TO manquant');
+
       return NextResponse.json(
-        { error: 'MAIL_TO manquant dans la configuration.' },
+        { error: 'Configuration email incomplète.' },
         { status: 500 }
       );
     }
 
-    const uploadedFiles = (json.uploadedFiles ?? []) as UploadedFile[];
+    const uploadedFiles = data.uploadedFiles ?? [];
 
     const photosText =
       uploadedFiles.length > 0
@@ -58,36 +63,39 @@ export async function POST(request: Request) {
       text: [
         `Nom: ${data.firstName} ${data.lastName}`,
         `Email: ${data.email}`,
-        `Téléphone: ${data.phone}`,
-        `Concession: ${data.dealership}`,
-        `Type véhicule: ${data.vehicleType}`,
+        `Téléphone: ${clean(data.phone)}`,
+        `Concession: ${clean(data.dealership || data.garageName || data.company)}`,
+        `Type véhicule: ${clean(data.vehicleType)}`,
         `Marque / modèle: ${data.brandModel}`,
-        `Année: ${data.year}`,
-        `Objectif: ${data.objective}`,
-        `Style souhaité: ${data.requestedStyle}`,
+        `Année: ${clean(data.year)}`,
+        `Objectif: ${clean(data.objective)}`,
+        `Style souhaité: ${clean(data.requestedStyle || data.style)}`,
         '',
         'Photos transmises:',
         photosText,
         '',
         'Message:',
-        data.message
+        clean(data.message)
       ].join('\n'),
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.5;">
-          <p><strong>Nouveau dépôt véhicule</strong></p>
+          <h2>Nouveau dépôt véhicule</h2>
+
           <p><strong>Nom :</strong> ${data.firstName} ${data.lastName}</p>
           <p><strong>Email :</strong> ${data.email}</p>
-          <p><strong>Téléphone :</strong> ${data.phone}</p>
-          <p><strong>Concession :</strong> ${data.dealership}</p>
-          <p><strong>Type :</strong> ${data.vehicleType}</p>
+          <p><strong>Téléphone :</strong> ${clean(data.phone)}</p>
+          <p><strong>Concession :</strong> ${clean(data.dealership || data.garageName || data.company)}</p>
+          <p><strong>Type :</strong> ${clean(data.vehicleType)}</p>
           <p><strong>Marque / modèle :</strong> ${data.brandModel}</p>
-          <p><strong>Année :</strong> ${data.year}</p>
-          <p><strong>Objectif :</strong> ${data.objective}</p>
-          <p><strong>Style :</strong> ${data.requestedStyle}</p>
+          <p><strong>Année :</strong> ${clean(data.year)}</p>
+          <p><strong>Objectif :</strong> ${clean(data.objective)}</p>
+          <p><strong>Style :</strong> ${clean(data.requestedStyle || data.style)}</p>
+
           <p><strong>Photos transmises :</strong></p>
           <ul>${photosHtml}</ul>
+
           <p><strong>Message :</strong></p>
-          <p>${data.message}</p>
+          <p>${clean(data.message)}</p>
         </div>
       `
     });
@@ -108,8 +116,11 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Erreur interne';
+    console.error('DEPOT VEHICULE ERROR:', error);
 
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Service indisponible, veuillez réessayer.' },
+      { status: 500 }
+    );
   }
 }

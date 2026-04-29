@@ -4,7 +4,6 @@ import { BeforeAfterSection } from '@/components/before-after-section';
 import { StylesSection } from '@/components/styles-section';
 import { TrustSection } from '@/components/trust-section';
 import { ProcessSection } from '@/components/process-section';
-import { OffersSection } from '@/components/offers-section';
 import { Button } from '@/components/ui/button';
 
 export default function HomePage() {
@@ -15,11 +14,12 @@ export default function HomePage() {
       <StylesSection />
       <TrustSection />
       <ProcessSection />
-      <OffersSection />
 
       <section className="section-spacing border-t border-technical/70">
         <div className="container-premium text-center">
-          <h2 className="font-serif text-3xl sm:text-4xl">Prêt à valoriser votre stock automobile ?</h2>
+          <h2 className="font-serif text-3xl sm:text-4xl">
+            Prêt à valoriser votre stock automobile ?
+          </h2>
           <p className="mx-auto mt-4 max-w-2xl text-foreground/80">
             Déposez un véhicule et recevez un rendu premium fidèle, sans aucune modification du véhicule.
           </p>

@@ -36,6 +36,16 @@ export const vehicleDepositSchema = z.object({
   requestedStyle: z.string().optional(),
   photosLink: z.string().optional(),
 
+  uploadedFiles: z
+    .array(
+      z.object({
+        name: z.string(),
+        url: z.string().url(),
+        size: z.number().optional()
+      })
+    )
+    .optional(),
+
   style: z
     .enum(['exterieur', 'showroom', 'lifestyle', 'concession'])
     .optional(),

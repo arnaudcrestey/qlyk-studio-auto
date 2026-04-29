@@ -6,7 +6,7 @@ export function BeforeAfterSection() {
       <div className="container-premium">
         <h2 className="text-center font-serif text-3xl sm:text-4xl">Avant / Après</h2>
         <p className="mx-auto mt-4 max-w-2xl text-center text-foreground/80">
-          Même véhicule. Aucune modification. Une présentation qui change tout.
+          Même véhicule. Nouveau contexte. Impact immédiat.
         </p>
 
         <div className="mt-10 grid gap-4 md:grid-cols-2">

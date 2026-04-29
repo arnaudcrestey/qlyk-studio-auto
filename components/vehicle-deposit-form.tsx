@@ -207,7 +207,7 @@ export function VehicleDepositForm() {
             Photos du véhicule
           </p>
           <p className="mt-1 text-sm leading-relaxed text-foreground/55">
-            Ajoutez 1 à 6 photos. Formats image acceptés. Taille maximale : 8 Mo par fichier.
+            Ajoutez jusqu’à 3 photos du véhicule. Formats image acceptés. Taille maximale : 8 Mo par fichier.
           </p>
         </div>
 
@@ -220,7 +220,11 @@ export function VehicleDepositForm() {
               size: file.size
             }));
 
-            setUploadedFiles(files);
+            setUploadedFiles((currentFiles) => {
+              const nextFiles = [...currentFiles, ...files];
+              return nextFiles.slice(0, 3);
+            });
+
             setStatus('idle');
             setMessage('');
           }}
@@ -238,7 +242,7 @@ export function VehicleDepositForm() {
           }}
           content={{
             label: 'Glissez vos photos ici ou cliquez pour sélectionner',
-            allowedContent: 'Images uniquement — jusqu’à 6 fichiers de 8 Mo'
+            allowedContent: 'Images uniquement — jusqu’à 3 fichiers de 8 Mo'
           }}
         />
 

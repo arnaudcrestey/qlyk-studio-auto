@@ -29,8 +29,10 @@ export const vehicleDepositSchema = z.object({
   email: z.string().email('Email invalide'),
   phone: z.string().optional(),
 
-  garageName: z.string().min(2, 'Nom du garage requis'),
-  vehicleModel: z.string().min(2, 'Modèle du véhicule requis'),
+  garageName: z.string().optional(),
+
+  brandModel: z.string().min(2, 'Marque et modèle requis'),
+  vehicleModel: z.string().optional(),
 
   style: z
     .enum(['exterieur', 'showroom', 'lifestyle', 'concession'])
@@ -41,39 +43,5 @@ export const vehicleDepositSchema = z.object({
 
 export type VehicleDepositInput = z.infer<typeof vehicleDepositSchema>;
 
-/**
- * Alias possible si une autre partie du projet utilise encore depotSchema
- */
 export const depotSchema = vehicleDepositSchema;
 export type DepotInput = VehicleDepositInput;
-export function validateDepot(data: unknown) {
-  const result = depotSchema.safeParse(data);
-
-  if (!result.success) {
-    return {
-      success: false,
-      errors: result.error.flatten().fieldErrors
-    };
-  }
-
-  return {
-    success: true,
-    data: result.data
-  };
-}
-
-export function validateContact(data: unknown) {
-  const result = contactSchema.safeParse(data);
-
-  if (!result.success) {
-    return {
-      success: false,
-      errors: result.error.flatten().fieldErrors
-    };
-  }
-
-  return {
-    success: true,
-    data: result.data
-  };
-}

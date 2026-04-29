@@ -4,17 +4,17 @@ const styles = [
   {
     title: 'Showroom premium',
     description: 'Présentation propre et nette, idéale pour un site de concession.',
-    image: '/images/bmw-premium.jpg',
+    image: '/images/peugeot-premium.jpg',
   },
   {
     title: 'Concession réaliste',
     description: 'Projection crédible dans un environnement automobile réel.',
-    image: '/images/bmw-lifestyle.jpg',
+    image: '/images/peugeot-lifestyle.jpg',
   },
   {
     title: 'Annonce optimisée',
-    description: 'Visuel clair et impactant pour Leboncoin / Autoscout.',
-    image: '/images/bmw-signature.jpg',
+    description: 'Visuel clair et impactant pour sites annonces.',
+    image: '/images/peugeot-signature.jpg',
   },
 ];
 

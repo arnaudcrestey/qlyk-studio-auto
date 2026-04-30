@@ -76,9 +76,8 @@ const steps = [
     text: 'Une photo claire du véhicule suffit pour démarrer.'
   },
   {
-    title: 'Vous choisissez l'ambiance de presentation',
-    text: 'EConcession réaliste, extérieur valorisant, showroom premium ou parc automobile.
-Nous adaptons la mise en scène pour structurer et valoriser votre véhicule.'
+    title: "Vous choisissez l’ambiance de présentation",
+    text: "Concession réaliste, extérieur valorisant, showroom premium ou parc automobile. Nous adaptons la mise en scène pour structurer et valoriser votre véhicule."
   },
   {
     title: 'Nous créons vos visuels',

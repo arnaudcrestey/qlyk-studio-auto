@@ -14,10 +14,17 @@ const offerLabels: Record<string, string> = {
   concession: 'Concession — sur devis'
 };
 
-function getOffer(json: any) {
-  if (json?.offer && typeof json.offer === 'string') {
-    return offerLabels[json.offer] || json.offer;
+function getOffer(json: unknown): string {
+  if (
+    typeof json === 'object' &&
+    json !== null &&
+    'offer' in json &&
+    typeof (json as { offer?: unknown }).offer === 'string'
+  ) {
+    const offer = (json as { offer: string }).offer;
+    return offerLabels[offer] || offer;
   }
+
   return 'Non renseignée';
 }
 
@@ -30,7 +37,10 @@ export async function POST(request: Request) {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Validation invalide' },
+        {
+          error: 'Validation invalide',
+          details: parsed.error.flatten().fieldErrors
+        },
         { status: 400 }
       );
     }
@@ -40,128 +50,71 @@ export async function POST(request: Request) {
 
     if (!recipient) {
       return NextResponse.json(
-        { error: 'MAIL_TO manquant' },
+        { error: 'Configuration email incomplète.' },
         { status: 500 }
       );
     }
 
     const uploadedFiles = data.uploadedFiles ?? [];
+    const dealership = clean(data.dealership || data.garageName || data.company);
+    const style = clean(data.requestedStyle || data.style);
 
-    const photosText = uploadedFiles.length
-      ? uploadedFiles.map((f, i) => `${i + 1}. ${f.name} — ${f.url}`).join('\n')
-      : 'Aucune photo';
+    const photosText =
+      uploadedFiles.length > 0
+        ? uploadedFiles.map((file, index) => `${index + 1}. ${file.name} — ${file.url}`).join('\n')
+        : 'Aucune photo transmise.';
 
-    const photosHtml = uploadedFiles.length
-      ? uploadedFiles
-          .map(
-            (f, i) =>
-              `<li><a href="${f.url}" target="_blank">Photo ${i + 1} — ${f.name}</a></li>`
-          )
-          .join('')
-      : '<li>Aucune photo</li>';
+    const photosHtml =
+      uploadedFiles.length > 0
+        ? uploadedFiles
+            .map(
+              (file, index) =>
+                `<li><a href="${file.url}" target="_blank" rel="noreferrer">Photo ${index + 1} — ${file.name}</a></li>`
+            )
+            .join('')
+        : '<li>Aucune photo transmise.</li>';
 
-    // EMAIL ADMIN
-    await sendMail({
-      to: recipient,
-      subject: `Nouveau dépôt — ${data.brandModel}`,
-      text: `
-Offre : ${selectedOffer}
+    const adminText = `
+Nouveau dépôt véhicule Qlyk Studio Auto
+
+Offre sélectionnée : ${selectedOffer}
 
 Nom : ${data.firstName} ${data.lastName}
 Email : ${data.email}
 Téléphone : ${clean(data.phone)}
+Concession : ${dealership}
 
-Véhicule : ${data.brandModel}
+Type véhicule : ${clean(data.vehicleType)}
+Marque / modèle : ${data.brandModel}
 Année : ${clean(data.year)}
-Style : ${clean(data.style)}
+Objectif : ${clean(data.objective)}
+Style souhaité : ${style}
 
-Photos :
+Photos transmises :
 ${photosText}
 
 Message :
 ${clean(data.message)}
-      `,
-      html: `
-        <div style="font-family:Arial;background:#050505;color:#fff;padding:30px;">
-          <h2>Nouveau dépôt véhicule</h2>
+`;
 
-          <p><strong>Offre :</strong> ${selectedOffer}</p>
-
-          <p><strong>Nom :</strong> ${data.firstName} ${data.lastName}</p>
-          <p><strong>Email :</strong> ${data.email}</p>
-          <p><strong>Téléphone :</strong> ${clean(data.phone)}</p>
-
-          <p><strong>Véhicule :</strong> ${data.brandModel}</p>
-          <p><strong>Année :</strong> ${clean(data.year)}</p>
-          <p><strong>Style :</strong> ${clean(data.style)}</p>
-
-          <p><strong>Photos :</strong></p>
-          <ul>${photosHtml}</ul>
-
-          <p><strong>Message :</strong></p>
-          <p>${clean(data.message)}</p>
-        </div>
-      `
-    });
-
-    // EMAIL CLIENT
-    await sendMail({
-      to: data.email,
-      subject: 'Qlyk Studio Auto — Dépôt reçu',
-      text: `
+    const clientText = `
 Bonjour ${data.firstName},
 
-Votre dépôt a bien été reçu.
+Votre dépôt véhicule a bien été reçu.
 
-Offre : ${selectedOffer}
+Offre sélectionnée : ${selectedOffer}
 Véhicule : ${data.brandModel}
 
-Nous revenons vers vous rapidement.
+Nous analysons vos photos et revenons vers vous rapidement avec la suite.
 
 Qlyk Studio Auto
-      `,
-      html: `
-        <div style="font-family:Arial;background:#050505;color:#fff;padding:30px;">
-          <h1>Qlyk Studio Auto</h1>
+Studio visuel automobile premium
+`;
 
-          <p>Bonjour ${data.firstName},</p>
-
-          <p>Votre dépôt véhicule a bien été reçu.</p>
-
-          <p><strong>Offre :</strong> ${selectedOffer}</p>
-          <p><strong>Véhicule :</strong> ${data.brandModel}</p>
-
-          <p>Nous revenons vers vous rapidement.</p>
-
-          <p>— Qlyk Studio Auto</p>
-        </div>
-      `
-    });
-
-    return NextResponse.json({ success: true });
-
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Erreur serveur' },
-      { status: 500 }
-    );
-  }
-}        `Nom: ${data.firstName} ${data.lastName}`,
-        `Email: ${data.email}`,
-        `Téléphone: ${clean(data.phone)}`,
-        `Concession: ${clean(data.dealership || data.garageName || data.company)}`,
-        `Type véhicule: ${clean(data.vehicleType)}`,
-        `Marque / modèle: ${data.brandModel}`,
-        `Année: ${clean(data.year)}`,
-        `Objectif: ${clean(data.objective)}`,
-        `Style souhaité: ${clean(data.requestedStyle || data.style)}`,
-        '',
-        'Photos transmises:',
-        photosText,
-        '',
-        'Message:',
-        clean(data.message)
-      ].join('\n'),
+    await sendMail({
+      to: recipient,
+      subject: `Nouveau dépôt véhicule — ${data.brandModel}`,
+      text: adminText,
       html: `
         <div style="font-family:Arial,sans-serif;background:#050505;color:#ffffff;padding:30px;">
           <div style="max-width:620px;margin:auto;">
@@ -181,7 +134,7 @@ Qlyk Studio Auto
               <p><strong>Nom :</strong> ${data.firstName} ${data.lastName}</p>
               <p><strong>Email :</strong> ${data.email}</p>
               <p><strong>Téléphone :</strong> ${clean(data.phone)}</p>
-              <p><strong>Concession :</strong> ${clean(data.dealership || data.garageName || data.company)}</p>
+              <p><strong>Concession :</strong> ${dealership}</p>
             </div>
 
             <div style="background:#111;padding:20px;border-radius:12px;margin-bottom:18px;">
@@ -189,7 +142,7 @@ Qlyk Studio Auto
               <p><strong>Marque / modèle :</strong> ${data.brandModel}</p>
               <p><strong>Année :</strong> ${clean(data.year)}</p>
               <p><strong>Objectif :</strong> ${clean(data.objective)}</p>
-              <p><strong>Style :</strong> ${clean(data.requestedStyle || data.style)}</p>
+              <p><strong>Style :</strong> ${style}</p>
             </div>
 
             <div style="background:#111;padding:20px;border-radius:12px;margin-bottom:18px;">
@@ -213,19 +166,7 @@ Qlyk Studio Auto
     await sendMail({
       to: data.email,
       subject: 'Qlyk Studio Auto — Dépôt véhicule reçu',
-      text: `
-Bonjour ${data.firstName},
-
-Votre dépôt véhicule a bien été reçu.
-
-Offre sélectionnée : ${selectedOffer}
-Véhicule : ${data.brandModel}
-
-Nous analysons vos photos et revenons vers vous rapidement avec la suite.
-
-Qlyk Studio Auto
-Studio visuel automobile premium
-      `,
+      text: clientText,
       html: `
         <div style="font-family:Arial,sans-serif;background:#050505;color:#ffffff;padding:30px;">
           <div style="max-width:620px;margin:auto;">
@@ -262,7 +203,7 @@ Studio visuel automobile premium
 
             <div style="margin-top:22px;background:#111;padding:20px;border-radius:14px;">
               <p><strong>Véhicule :</strong> ${data.brandModel}</p>
-              <p><strong>Style souhaité :</strong> ${clean(data.requestedStyle || data.style)}</p>
+              <p><strong>Style souhaité :</strong> ${style}</p>
             </div>
 
             <p style="margin-top:28px;">
@@ -276,130 +217,6 @@ Studio visuel automobile premium
     });
 
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error('DEPOT VEHICULE ERROR:', error);
-
-    return NextResponse.json(
-      { error: 'Service indisponible, veuillez réessayer.' },
-      { status: 500 }
-    );
-  }
-}        `Style souhaité: ${clean(data.requestedStyle || data.style)}`,
-        '',
-        'Photos:',
-        photosText,
-        '',
-        'Message:',
-        clean(data.message)
-      ].join('\n'),
-      html: `
-        <div style="font-family: Arial, sans-serif; background:#050505; color:#fff; padding:30px;">
-          <div style="max-width:600px;margin:auto;">
-
-            <h2 style="margin-bottom:20px;">🚗 Nouveau dépôt véhicule</h2>
-
-            <div style="background:#111;padding:20px;border-radius:10px;margin-bottom:20px;">
-              <p><strong>Offre :</strong> <span style="color:#3b82f6;">${selectedOffer}</span></p>
-            </div>
-
-            <div style="background:#111;padding:20px;border-radius:10px;margin-bottom:20px;">
-              <p><strong>Nom :</strong> ${data.firstName} ${data.lastName}</p>
-              <p><strong>Email :</strong> ${data.email}</p>
-              <p><strong>Téléphone :</strong> ${clean(data.phone)}</p>
-              <p><strong>Concession :</strong> ${clean(data.dealership || data.garageName || data.company)}</p>
-            </div>
-
-            <div style="background:#111;padding:20px;border-radius:10px;margin-bottom:20px;">
-              <p><strong>Type :</strong> ${clean(data.vehicleType)}</p>
-              <p><strong>Marque / modèle :</strong> ${data.brandModel}</p>
-              <p><strong>Année :</strong> ${clean(data.year)}</p>
-              <p><strong>Objectif :</strong> ${clean(data.objective)}</p>
-              <p><strong>Style :</strong> ${clean(data.requestedStyle || data.style)}</p>
-            </div>
-
-            <div style="background:#111;padding:20px;border-radius:10px;margin-bottom:20px;">
-              <p><strong>Photos :</strong></p>
-              <ul>${photosHtml}</ul>
-            </div>
-
-            <div style="background:#111;padding:20px;border-radius:10px;">
-              <p><strong>Message :</strong></p>
-              <p>${clean(data.message)}</p>
-            </div>
-
-            <p style="margin-top:30px;font-size:12px;color:#777;">
-              Qlyk Studio Auto — Notification automatique
-            </p>
-
-          </div>
-        </div>
-      `
-    });
-
-    /**
-     * EMAIL CLIENT (PREMIUM)
-     */
-    await sendMail({
-      to: data.email,
-      subject: 'Qlyk Studio Auto — Dépôt véhicule reçu',
-      text: `
-Bonjour ${data.firstName},
-
-Votre dépôt véhicule a bien été reçu.
-
-Offre sélectionnée : ${selectedOffer}
-Véhicule : ${data.brandModel}
-
-Nous analysons votre demande et revenons vers vous rapidement.
-
-Qlyk Studio Auto
-      `,
-      html: `
-        <div style="font-family: Arial, sans-serif; background:#050505; color:#fff; padding:30px;">
-          <div style="max-width:600px;margin:auto;">
-
-            <h1 style="margin-bottom:10px;">Qlyk Studio Auto</h1>
-            <p style="color:#888;margin-bottom:30px;">Studio visuel automobile premium</p>
-
-            <p>Bonjour ${data.firstName},</p>
-
-            <p>Votre dépôt véhicule a bien été reçu.</p>
-
-            <p>
-              Offre sélectionnée : 
-              <strong style="color:#3b82f6;">${selectedOffer}</strong>
-            </p>
-
-            <p>
-              Véhicule : <strong>${data.brandModel}</strong>
-            </p>
-
-            <p>
-              Nous analysons vos photos et revenons vers vous rapidement avec la suite.
-            </p>
-
-            <div style="margin:30px 0;padding:20px;background:#111;border-radius:10px;">
-              <p style="margin:0;color:#ccc;">
-                ⚡ Traitement rapide<br/>
-                🚗 Aucun modification du véhicule<br/>
-                📩 Suivi personnalisé
-              </p>
-            </div>
-
-            <p>À très bientôt,</p>
-
-            <p>
-              <strong>Qlyk Studio Auto</strong><br/>
-              Studio visuel automobile premium
-            </p>
-
-          </div>
-        </div>
-      `
-    });
-
-    return NextResponse.json({ success: true });
-
   } catch (error) {
     console.error('DEPOT VEHICULE ERROR:', error);
 

@@ -2,7 +2,7 @@
 
 import { FormEvent, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { UploadCloud, X } from 'lucide-react';
+import { CheckCircle2, Loader2, UploadCloud, X } from 'lucide-react';
 import { UploadDropzone } from '@/lib/uploadthing';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +10,7 @@ import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
+type UploadStatus = 'idle' | 'selecting' | 'uploading' | 'done' | 'error';
 type Offer = 'essentiel' | 'pro' | 'concession';
 
 type UploadedFile = {
@@ -48,6 +49,7 @@ export function VehicleDepositForm() {
   const router = useRouter();
 
   const [status, setStatus] = useState<Status>('idle');
+  const [uploadStatus, setUploadStatus] = useState<UploadStatus>('idle');
   const [message, setMessage] = useState('');
   const [selectedOffer, setSelectedOffer] = useState<Offer>('essentiel');
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
@@ -56,6 +58,8 @@ export function VehicleDepositForm() {
     () => offerOptions.find((offer) => offer.value === selectedOffer),
     [selectedOffer]
   );
+
+  const isUploading = uploadStatus === 'uploading' || uploadStatus === 'selecting';
 
   function handleOfferChange(offer: Offer) {
     if (offer === 'concession') {
@@ -211,58 +215,95 @@ export function VehicleDepositForm() {
               Photos du véhicule
             </p>
             <p className="mt-1 text-sm leading-relaxed text-foreground/55">
-              Ajoutez jusqu’à 3 photos. Vous pourrez les vérifier avant l’envoi.
+              Ajoutez jusqu’à 3 photos. Une confirmation apparaît dès que le chargement commence.
             </p>
           </div>
         </div>
 
-        <UploadDropzone
-  endpoint="vehiclePhotos"
-  onClientUploadComplete={(res) => {
-    const files = res.map((file) => ({
-      name: file.name,
-      url: file.url,
-      size: file.size
-    }));
+        <div className="relative">
+          <UploadDropzone
+            endpoint="vehiclePhotos"
+            onUploadBegin={() => {
+              setUploadStatus('uploading');
+              setMessage('Chargement des photos en cours… restez sur cette page.');
+              setStatus('idle');
+            }}
+            onClientUploadComplete={(res) => {
+              const files = res.map((file) => ({
+                name: file.name,
+                url: file.url,
+                size: file.size
+              }));
 
-    setUploadedFiles((currentFiles) => {
-      const nextFiles = [...currentFiles, ...files];
-      return nextFiles.slice(0, 3);
-    });
+              setUploadedFiles((currentFiles) => {
+                const nextFiles = [...currentFiles, ...files];
+                return nextFiles.slice(0, 3);
+              });
 
-    setStatus('idle');
-    setMessage('');
-  }}
-  onUploadError={(error: Error) => {
-    setStatus('error');
-    setMessage(error.message || 'Erreur pendant l’envoi des photos.');
-  }}
-  appearance={{
-    container:
-      'qlyk-upload-zone group relative overflow-hidden rounded-3xl border border-dashed border-white/15 bg-[radial-gradient(circle_at_center,rgba(37,99,235,0.10),rgba(255,255,255,0.03)_40%,rgba(0,0,0,0.28)_100%)] p-10 transition-all duration-500 hover:border-premium/70 hover:shadow-[0_0_60px_rgba(37,99,235,0.4)] ut-uploading:border-premium ut-uploading:shadow-[0_0_80px_rgba(37,99,235,0.6)]',
+              setUploadStatus('done');
+              setStatus('idle');
+              setMessage('Photos chargées avec succès. Vous pouvez vérifier les visuels avant l’envoi.');
+            }}
+            onUploadError={(error: Error) => {
+              setUploadStatus('error');
+              setStatus('error');
+              setMessage(error.message || 'Erreur pendant l’envoi des photos.');
+            }}
+            appearance={{
+              container:
+                'group relative overflow-hidden rounded-3xl border border-dashed border-white/15 bg-[radial-gradient(circle_at_center,rgba(37,99,235,0.12),rgba(255,255,255,0.035)_42%,rgba(0,0,0,0.32)_100%)] p-10 transition-all duration-500 hover:border-premium/70 hover:shadow-[0_0_60px_rgba(37,99,235,0.35)] ut-uploading:border-premium ut-uploading:shadow-[0_0_80px_rgba(37,99,235,0.55)]',
+              label:
+                'text-foreground text-base font-semibold transition-all duration-300 group-hover:text-white',
+              allowedContent:
+                'text-foreground/45 text-sm mt-2',
+              button:
+                'mt-5 rounded-full bg-premium px-7 py-3 text-sm font-semibold text-white shadow-[0_0_24px_rgba(37,99,235,0.35)] transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_45px_rgba(37,99,235,0.65)] ut-uploading:opacity-70 ut-readying:opacity-70'
+            }}
+            content={{
+              label:
+                isUploading
+                  ? 'Chargement en cours…'
+                  : 'Glissez vos photos ici ou cliquez pour sélectionner',
+              allowedContent:
+                isUploading
+                  ? 'Veuillez patienter, vos photos sont en cours de transfert.'
+                  : 'JPG, PNG — jusqu’à 3 photos — 8 Mo max',
+              button:
+                isUploading
+                  ? 'Chargement...'
+                  : uploadedFiles.length > 0
+                    ? 'Ajouter une autre photo'
+                    : 'Choisir les photos'
+            }}
+          />
 
-    label:
-      'text-foreground text-base font-medium transition-all duration-300 group-hover:text-white',
+          {isUploading && (
+            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center rounded-3xl bg-black/70 backdrop-blur-sm">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full border border-premium/40 bg-premium/15 text-premium shadow-[0_0_40px_rgba(37,99,235,0.45)]">
+                <Loader2 className="animate-spin" size={26} />
+              </div>
 
-    allowedContent:
-      'text-foreground/45 text-sm mt-2',
+              <p className="mt-4 text-sm font-semibold text-white">
+                Photos en cours de chargement
+              </p>
 
-    button:
-      'mt-5 rounded-full bg-premium px-6 py-2.5 text-sm font-medium text-white shadow-[0_0_20px_rgba(37,99,235,0.3)] transition-all duration-300 hover:shadow-[0_0_40px_rgba(37,99,235,0.6)] ut-uploading:opacity-70 ut-readying:opacity-70'
-  }}
-  content={{
-  label: 'Déposez votre véhicule comme en studio ou cliquez pour sélectionner',
-  allowedContent: 'JPG, PNG — jusqu’à 3 photos (8 Mo max)',
-  button: 'Importer les photos'
-}}
-/>
+              <p className="mt-2 max-w-sm text-center text-sm leading-relaxed text-white/55">
+                Cela peut prendre quelques instants selon le poids des images. Ne fermez pas la page.
+              </p>
+
+              <div className="mt-5 h-1.5 w-56 overflow-hidden rounded-full bg-white/10">
+                <div className="h-full w-1/2 animate-pulse rounded-full bg-premium" />
+              </div>
+            </div>
+          )}
+        </div>
 
         {uploadedFiles.length > 0 && (
           <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {uploadedFiles.map((file, index) => (
               <div
                 key={file.url}
-                className="group overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04]"
+                className="group overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] shadow-[0_0_35px_rgba(0,0,0,0.18)]"
               >
                 <div className="relative aspect-[4/3] overflow-hidden bg-black">
                   <img
@@ -283,6 +324,11 @@ export function VehicleDepositForm() {
                   <div className="absolute left-3 top-3 rounded-full bg-green-400/90 px-3 py-1 text-xs font-semibold text-black">
                     Photo {index + 1}
                   </div>
+
+                  <div className="absolute bottom-3 left-3 flex items-center gap-2 rounded-full bg-black/70 px-3 py-1.5 text-xs font-medium text-white backdrop-blur">
+                    <CheckCircle2 size={14} className="text-green-300" />
+                    Chargée
+                  </div>
                 </div>
 
                 <div className="p-4">
@@ -290,7 +336,7 @@ export function VehicleDepositForm() {
                     {file.name}
                   </p>
                   <p className="mt-1 text-xs text-foreground/45">
-                    Photo chargée avec succès
+                    Photo prête pour la demande
                   </p>
                 </div>
               </div>
@@ -310,20 +356,24 @@ export function VehicleDepositForm() {
         </div>
 
         <Button
-          disabled={status === 'loading'}
+          disabled={status === 'loading' || isUploading}
           type="submit"
           className="h-12 rounded-full px-8 text-sm font-medium sm:min-w-[240px]"
         >
-          {status === 'loading' ? 'Envoi en cours...' : 'Continuer avec cette offre'}
+          {status === 'loading'
+            ? 'Envoi en cours...'
+            : isUploading
+              ? 'Chargement des photos...'
+              : 'Continuer avec cette offre'}
         </Button>
       </div>
 
       {message && (
         <p
           className={`mt-5 rounded-2xl border px-4 py-3 text-sm ${
-            status === 'success'
-              ? 'border-green-400/30 bg-green-400/10 text-green-300'
-              : 'border-red-400/30 bg-red-400/10 text-red-300'
+            status === 'error'
+              ? 'border-red-400/30 bg-red-400/10 text-red-300'
+              : 'border-green-400/30 bg-green-400/10 text-green-300'
           }`}
           role="status"
         >

@@ -77,7 +77,7 @@ const steps = [
   },
   {
     title: "Vous choisissez l’ambiance de présentation",
-    text: "Concession réaliste, extérieur valorisant, showroom premium ou parc automobile. Nous adaptons la mise en scène pour structurer et valoriser votre véhicule."
+    text: "Concession, extérieur, showroom ou parc — nous construisons une mise en scène cohérente et valorisante."
   },
   {
     title: 'Nous créons vos visuels',

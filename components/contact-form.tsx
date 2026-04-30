@@ -51,15 +51,16 @@ export function ContactForm() {
 
       <div className="mb-10 text-center">
         <p className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-blue-300/80">
-          Contact concession
+          Contact Qlyk Studio Auto
         </p>
 
         <h1 className="font-serif text-4xl font-light tracking-tight text-white sm:text-5xl">
-          Parlons de votre production visuelle
+          Parlons de votre besoin visuel automobile
         </h1>
 
         <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-white/60 sm:text-base">
-          Une demande dédiée aux concessions, garages et professionnels souhaitant produire des visuels automobiles haut de gamme à partir de photos existantes.
+          Concession, garage, professionnel auto ou demande ponctuelle : expliquez-nous votre besoin,
+          nous vous répondons avec une orientation claire.
         </p>
       </div>
 
@@ -69,12 +70,15 @@ export function ContactForm() {
 
           <div className="relative space-y-8">
             <div>
-              <p className="text-sm font-medium text-blue-300">Offre concession</p>
+              <p className="text-sm font-medium text-blue-300">Premier échange</p>
+
               <h2 className="mt-3 font-serif text-3xl font-light text-white">
-                Production régulière sur devis.
+                Une demande simple, une réponse qualifiée.
               </h2>
+
               <p className="mt-4 text-sm leading-6 text-white/60">
-                Indiquez votre volume, votre besoin et votre manière de travailler. Nous vous répondons avec une approche adaptée à votre parc automobile.
+                Décrivez votre situation, même si elle n’est pas encore totalement définie.
+                Nous vous orientons selon votre véhicule, votre volume ou votre objectif commercial.
               </p>
             </div>
 
@@ -82,9 +86,9 @@ export function ContactForm() {
               <div className="flex gap-3 rounded-2xl border border-white/10 bg-black/20 p-4">
                 <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-blue-300" />
                 <div>
-                  <p className="text-sm font-semibold text-white">Véhicule préservé</p>
+                  <p className="text-sm font-semibold text-white">Véhicule respecté</p>
                   <p className="mt-1 text-xs leading-5 text-white/55">
-                    Couleur, jantes, carrosserie et proportions ne sont jamais modifiées.
+                    Forme, couleur, jantes, carrosserie et proportions ne sont jamais modifiées.
                   </p>
                 </div>
               </div>
@@ -94,7 +98,7 @@ export function ContactForm() {
                 <div>
                   <p className="text-sm font-semibold text-white">Réponse personnalisée</p>
                   <p className="mt-1 text-xs leading-5 text-white/55">
-                    Votre demande est étudiée selon votre volume et votre style de concession.
+                    Votre demande est étudiée selon votre besoin, votre usage et votre niveau de volume.
                   </p>
                 </div>
               </div>
@@ -102,9 +106,9 @@ export function ContactForm() {
               <div className="flex gap-3 rounded-2xl border border-white/10 bg-black/20 p-4">
                 <Phone className="mt-0.5 h-5 w-5 shrink-0 text-blue-300" />
                 <div>
-                  <p className="text-sm font-semibold text-white">Échange simple</p>
+                  <p className="text-sm font-semibold text-white">Échange direct</p>
                   <p className="mt-1 text-xs leading-5 text-white/55">
-                    Nous pouvons affiner le rendu après une première voiture test.
+                    Pour un test véhicule, une demande ponctuelle ou une production régulière.
                   </p>
                 </div>
               </div>
@@ -133,7 +137,7 @@ export function ContactForm() {
             <Input
               name="email"
               type="email"
-              placeholder="Email professionnel"
+              placeholder="Email"
               required
               className="h-12 rounded-xl border-white/10 bg-black/35 text-white placeholder:text-white/35 focus-visible:ring-blue-400"
             />
@@ -149,7 +153,7 @@ export function ContactForm() {
 
           <Input
             name="company"
-            placeholder="Nom du garage ou de la concession"
+            placeholder="Société, garage ou nom de l’activité"
             required
             className="h-12 rounded-xl border-white/10 bg-black/35 text-white placeholder:text-white/35 focus-visible:ring-blue-400"
           />
@@ -157,7 +161,7 @@ export function ContactForm() {
           <div className="grid gap-4 sm:grid-cols-2">
             <Input
               name="volume"
-              placeholder="Volume mensuel estimé"
+              placeholder="Volume estimé ou besoin ponctuel"
               className="h-12 rounded-xl border-white/10 bg-black/35 text-white placeholder:text-white/35 focus-visible:ring-blue-400"
             />
 
@@ -170,7 +174,7 @@ export function ContactForm() {
 
           <Textarea
             name="message"
-            placeholder="Expliquez votre besoin : type de véhicules, volume, style souhaité, usage des visuels, contraintes éventuelles..."
+            placeholder="Expliquez votre besoin : véhicule unique, projet ponctuel, concession, volume, style souhaité, usage des visuels..."
             required
             className="min-h-36 rounded-xl border-white/10 bg-black/35 text-white placeholder:text-white/35 focus-visible:ring-blue-400"
           />
@@ -179,7 +183,7 @@ export function ContactForm() {
 
           <div className="flex flex-col gap-4 pt-2 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-xs leading-5 text-white/45">
-              Demande sans engagement. Réponse adaptée à votre rythme de production.
+              Demande sans engagement. Réponse adaptée à votre situation et à votre niveau de besoin.
             </p>
 
             <Button

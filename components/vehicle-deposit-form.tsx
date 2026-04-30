@@ -251,9 +251,10 @@ export function VehicleDepositForm() {
       'mt-5 rounded-full bg-premium px-6 py-2.5 text-sm font-medium text-white shadow-[0_0_20px_rgba(37,99,235,0.3)] transition-all duration-300 hover:shadow-[0_0_40px_rgba(37,99,235,0.6)] ut-uploading:opacity-70 ut-readying:opacity-70'
   }}
   content={{
-    label: 'Déposez votre véhicule comme en studio ou cliquez pour sélectionner',
-    allowedContent: 'JPG, PNG — jusqu’à 3 photos (8 Mo max)'
-  }}
+  label: 'Déposez votre véhicule comme en studio ou cliquez pour sélectionner',
+  allowedContent: 'JPG, PNG — jusqu’à 3 photos (8 Mo max)',
+  button: 'Importer les photos'
+}}
 />
 
         {uploadedFiles.length > 0 && (

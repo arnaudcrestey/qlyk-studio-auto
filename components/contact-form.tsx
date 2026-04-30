@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
+import { ArrowRight, CheckCircle2, Loader2, Mail, Phone, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -16,7 +17,8 @@ export function ContactForm() {
     setStatus('loading');
     setMessage('');
 
-    const formData = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const formData = new FormData(form);
     const payload = Object.fromEntries(formData.entries());
 
     try {
@@ -30,41 +32,190 @@ export function ContactForm() {
 
       if (!response.ok) {
         setStatus('error');
-        setMessage(data.error ?? 'Erreur lors de l’envoi.');
+        setMessage(data.error ?? 'Une erreur est survenue lors de l’envoi.');
         return;
       }
 
       setStatus('success');
-      setMessage('Votre demande a bien été envoyée.');
-      event.currentTarget.reset();
+      setMessage('Votre demande a bien été envoyée. Nous revenons vers vous rapidement.');
+      form.reset();
     } catch {
       setStatus('error');
-      setMessage('Service indisponible, veuillez réessayer.');
+      setMessage('Service momentanément indisponible. Veuillez réessayer.');
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-xl border border-technical/70 bg-technical/25 p-5 sm:p-7">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Input name="firstName" placeholder="Prénom" required />
-        <Input name="lastName" placeholder="Nom" required />
-      </div>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Input name="email" type="email" placeholder="Email" required />
-        <Input name="phone" type="tel" placeholder="Téléphone" required />
-      </div>
-      <Input name="company" placeholder="Société" required />
-      <Textarea name="message" placeholder="Votre message" required />
-      <div className="flex justify-center sm:justify-start">
-        <Button disabled={status === 'loading'} type="submit">
-          {status === 'loading' ? 'Envoi...' : 'Envoyer'}
-        </Button>
-      </div>
-      {message ? (
-        <p className={status === 'success' ? 'text-green-400' : 'text-red-400'} role="status">
-          {message}
+    <section className="relative mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:py-16">
+      <div className="absolute inset-x-0 top-0 -z-10 mx-auto h-72 max-w-4xl rounded-full bg-blue-500/10 blur-3xl" />
+
+      <div className="mb-10 text-center">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-blue-300/80">
+          Contact concession
         </p>
-      ) : null}
-    </form>
+
+        <h1 className="font-serif text-4xl font-light tracking-tight text-white sm:text-5xl">
+          Parlons de votre production visuelle
+        </h1>
+
+        <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-white/60 sm:text-base">
+          Une demande dédiée aux concessions, garages et professionnels souhaitant produire des visuels automobiles haut de gamme à partir de photos existantes.
+        </p>
+      </div>
+
+      <div className="grid overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.035] shadow-2xl shadow-black/40 backdrop-blur-xl lg:grid-cols-[0.9fr_1.4fr]">
+        <aside className="relative border-b border-white/10 bg-gradient-to-br from-white/[0.07] to-blue-500/[0.05] p-6 sm:p-8 lg:border-b-0 lg:border-r">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.18),transparent_38%)]" />
+
+          <div className="relative space-y-8">
+            <div>
+              <p className="text-sm font-medium text-blue-300">Offre concession</p>
+              <h2 className="mt-3 font-serif text-3xl font-light text-white">
+                Production régulière sur devis.
+              </h2>
+              <p className="mt-4 text-sm leading-6 text-white/60">
+                Indiquez votre volume, votre besoin et votre manière de travailler. Nous vous répondons avec une approche adaptée à votre parc automobile.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex gap-3 rounded-2xl border border-white/10 bg-black/20 p-4">
+                <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-blue-300" />
+                <div>
+                  <p className="text-sm font-semibold text-white">Véhicule préservé</p>
+                  <p className="mt-1 text-xs leading-5 text-white/55">
+                    Couleur, jantes, carrosserie et proportions ne sont jamais modifiées.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-3 rounded-2xl border border-white/10 bg-black/20 p-4">
+                <Mail className="mt-0.5 h-5 w-5 shrink-0 text-blue-300" />
+                <div>
+                  <p className="text-sm font-semibold text-white">Réponse personnalisée</p>
+                  <p className="mt-1 text-xs leading-5 text-white/55">
+                    Votre demande est étudiée selon votre volume et votre style de concession.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-3 rounded-2xl border border-white/10 bg-black/20 p-4">
+                <Phone className="mt-0.5 h-5 w-5 shrink-0 text-blue-300" />
+                <div>
+                  <p className="text-sm font-semibold text-white">Échange simple</p>
+                  <p className="mt-1 text-xs leading-5 text-white/55">
+                    Nous pouvons affiner le rendu après une première voiture test.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <form onSubmit={handleSubmit} className="space-y-5 p-6 sm:p-8">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Input
+              name="firstName"
+              placeholder="Prénom"
+              required
+              className="h-12 rounded-xl border-white/10 bg-black/35 text-white placeholder:text-white/35 focus-visible:ring-blue-400"
+            />
+
+            <Input
+              name="lastName"
+              placeholder="Nom"
+              required
+              className="h-12 rounded-xl border-white/10 bg-black/35 text-white placeholder:text-white/35 focus-visible:ring-blue-400"
+            />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Input
+              name="email"
+              type="email"
+              placeholder="Email professionnel"
+              required
+              className="h-12 rounded-xl border-white/10 bg-black/35 text-white placeholder:text-white/35 focus-visible:ring-blue-400"
+            />
+
+            <Input
+              name="phone"
+              type="tel"
+              placeholder="Téléphone"
+              required
+              className="h-12 rounded-xl border-white/10 bg-black/35 text-white placeholder:text-white/35 focus-visible:ring-blue-400"
+            />
+          </div>
+
+          <Input
+            name="company"
+            placeholder="Nom du garage ou de la concession"
+            required
+            className="h-12 rounded-xl border-white/10 bg-black/35 text-white placeholder:text-white/35 focus-visible:ring-blue-400"
+          />
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Input
+              name="volume"
+              placeholder="Volume mensuel estimé"
+              className="h-12 rounded-xl border-white/10 bg-black/35 text-white placeholder:text-white/35 focus-visible:ring-blue-400"
+            />
+
+            <Input
+              name="location"
+              placeholder="Ville / secteur"
+              className="h-12 rounded-xl border-white/10 bg-black/35 text-white placeholder:text-white/35 focus-visible:ring-blue-400"
+            />
+          </div>
+
+          <Textarea
+            name="message"
+            placeholder="Expliquez votre besoin : type de véhicules, volume, style souhaité, usage des visuels, contraintes éventuelles..."
+            required
+            className="min-h-36 rounded-xl border-white/10 bg-black/35 text-white placeholder:text-white/35 focus-visible:ring-blue-400"
+          />
+
+          <input type="hidden" name="offer" value="concession" />
+
+          <div className="flex flex-col gap-4 pt-2 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-xs leading-5 text-white/45">
+              Demande sans engagement. Réponse adaptée à votre rythme de production.
+            </p>
+
+            <Button
+              disabled={status === 'loading'}
+              type="submit"
+              className="h-12 rounded-full bg-blue-500 px-7 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:bg-blue-400 disabled:opacity-70"
+            >
+              {status === 'loading' ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Envoi en cours
+                </>
+              ) : (
+                <>
+                  Envoyer ma demande
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </>
+              )}
+            </Button>
+          </div>
+
+          {message ? (
+            <div
+              role="status"
+              className={
+                status === 'success'
+                  ? 'flex items-start gap-3 rounded-2xl border border-green-400/20 bg-green-400/10 p-4 text-sm text-green-300'
+                  : 'rounded-2xl border border-red-400/20 bg-red-400/10 p-4 text-sm text-red-300'
+              }
+            >
+              {status === 'success' ? <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /> : null}
+              <p>{message}</p>
+            </div>
+          ) : null}
+        </form>
+      </div>
+    </section>
   );
 }

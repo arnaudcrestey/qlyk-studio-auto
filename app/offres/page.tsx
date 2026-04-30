@@ -9,7 +9,7 @@ const offers = [
     price: '39€',
     priceNote: 'HT / véhicule',
     description:
-      'Tester la qualité Qlyk sur un premier véhicule avec un visuel prêt à vendre.',
+      'Un visuel premium pour valoriser votre véhicule.',
     items: [
       '1 photo envoyée',
       '1 visuel premium optimisé',
@@ -25,15 +25,15 @@ const offers = [
     price: '89€',
     priceNote: 'HT / véhicule',
     description:
-      'Créer plusieurs visuels complémentaires du même véhicule pour mieux valoriser une annonce.',
+      'Plusieurs visuels premium pour valoriser une annonce.',
     items: [
       '1 véhicule',
       '3 visuels complémentaires',
-      'annonce principale, réseaux sociaux, image premium',
+      'annonce principale, réseaux sociaux',
       'cohérence visuelle renforcée'
     ],
     note:
-      'Idéal pour disposer d’un visuel principal, d’une variante de mise en avant et d’une image premium.',
+      'Idéal pour disposer d’un visuel principal et d’une variante du même véhicule.',
     cta: 'Créer mes visuels',
     highlight: true
   },

@@ -239,8 +239,7 @@ export function VehicleDepositForm() {
           }}
           appearance={{
             container:
-              'rounded-3xl border border-dashed border-white/15 bg-white/[0.03] p-8 transition hover:border-premium/50 hover:bg-premium/[0.04]',
-            label: 'text-foreground font-medium',
+  'relative overflow-hidden rounded-3xl border border-dashed border-white/15 bg-[radial-gradient(circle_at_center,rgba(37,99,235,0.12),rgba(255,255,255,0.03)_38%,rgba(0,0,0,0.2)_100%)] p-8 transition-all duration-500 hover:border-premium/70 hover:bg-premium/[0.06] hover:shadow-[0_0_45px_rgba(37,99,235,0.35)] ut-uploading:border-premium ut-uploading:shadow-[0_0_60px_rgba(37,99,235,0.45)]',            label: 'text-foreground font-medium',
             allowedContent: 'text-foreground/45 text-sm',
             button:
               'rounded-full bg-premium px-5 py-2 text-sm font-medium text-white ut-readying:bg-premium/70 ut-uploading:bg-premium/70'

@@ -5,7 +5,8 @@ import { contactSchema } from '@/lib/validations';
 const offerLabels: Record<string, string> = {
   essentiel: 'Essentiel — 39€ HT',
   pro: 'Pro — 89€ HT',
-  concession: 'Concession — sur devis'
+  concession: 'Contact / demande sur devis',
+  contact: 'Contact / demande générale'
 };
 
 function escapeHtml(value: unknown): string {
@@ -17,10 +18,10 @@ function escapeHtml(value: unknown): string {
     .replaceAll("'", '&#039;');
 }
 
-function getOptionalValue(data: unknown, key: string): string {
-  if (typeof data !== 'object' || data === null) return '';
-  const value = (data as Record<string, unknown>)[key];
-  return typeof value === 'string' ? value : '';
+function getRawValue(source: unknown, key: string): string {
+  if (typeof source !== 'object' || source === null) return '';
+  const value = (source as Record<string, unknown>)[key];
+  return typeof value === 'string' ? value.trim() : '';
 }
 
 export async function POST(request: Request) {
@@ -48,83 +49,83 @@ export async function POST(request: Request) {
       );
     }
 
-    const offerValue =
-      'offer' in data && typeof data.offer === 'string'
-        ? data.offer
-        : 'non-renseignee';
+    const offerValue = getRawValue(json, 'offer') || 'contact';
+    const selectedOffer = offerLabels[offerValue] || 'Contact / demande générale';
 
-    const selectedOffer = offerLabels[offerValue] || 'Non renseignée';
-    const isConcession = offerValue === 'concession';
+    const firstNameRaw = data.firstName;
+    const lastNameRaw = data.lastName;
+    const emailRaw = data.email;
+    const phoneRaw = data.phone || 'Non renseigné';
+    const companyRaw = data.company || 'Non renseigné';
+    const messageRaw = data.message || 'Aucun message complémentaire.';
+    const volumeRaw = getRawValue(json, 'volume') || 'Non renseigné';
+    const locationRaw = getRawValue(json, 'location') || 'Non renseigné';
 
-    const firstName = escapeHtml(data.firstName);
-    const lastName = escapeHtml(data.lastName);
-    const email = escapeHtml(data.email);
-    const phone = escapeHtml(data.phone || 'Non renseigné');
-    const company = escapeHtml(data.company || 'Non renseigné');
-    const message = escapeHtml(data.message || 'Aucun message complémentaire.');
+    const firstName = escapeHtml(firstNameRaw);
+    const lastName = escapeHtml(lastNameRaw);
+    const email = escapeHtml(emailRaw);
+    const phone = escapeHtml(phoneRaw);
+    const company = escapeHtml(companyRaw);
+    const message = escapeHtml(messageRaw);
+    const volume = escapeHtml(volumeRaw);
+    const location = escapeHtml(locationRaw);
     const safeOffer = escapeHtml(selectedOffer);
-
-    const volume = escapeHtml(getOptionalValue(data, 'volume') || 'Non renseigné');
-    const location = escapeHtml(getOptionalValue(data, 'location') || 'Non renseigné');
 
     await sendMail({
       to: recipient,
-      subject: isConcession
-        ? 'Nouvelle demande concession Qlyk — Sur devis'
-        : `Nouveau contact Qlyk — ${selectedOffer}`,
+      subject: `Nouvelle demande Qlyk Studio Auto — ${selectedOffer}`,
       text: `
-Nouveau contact Qlyk Studio Auto
+Nouvelle demande Qlyk Studio Auto
 
-Type de demande : ${isConcession ? 'Contact concession / sur devis' : 'Dépôt véhicule'}
-Offre sélectionnée : ${selectedOffer}
+Type de demande : ${selectedOffer}
 
 Client :
-${data.firstName} ${data.lastName}
-Email : ${data.email}
-Téléphone : ${data.phone || 'Non renseigné'}
-Société : ${data.company || 'Non renseigné'}
-Volume mensuel : ${getOptionalValue(data, 'volume') || 'Non renseigné'}
-Ville / secteur : ${getOptionalValue(data, 'location') || 'Non renseigné'}
+${firstNameRaw} ${lastNameRaw}
+Email : ${emailRaw}
+Téléphone : ${phoneRaw}
+Société / garage : ${companyRaw}
+Volume / besoin : ${volumeRaw}
+Ville / secteur : ${locationRaw}
 
 Message :
-${data.message || 'Aucun message complémentaire.'}
+${messageRaw}
 
 Qlyk Studio Auto
 Notification automatique
       `,
       html: `
         <div style="margin:0;padding:0;background:#050505;font-family:Arial,Helvetica,sans-serif;color:#ffffff;">
-          <div style="max-width:640px;margin:0 auto;padding:32px 20px;">
-            <div style="padding:22px 24px;border:1px solid #1f2937;border-radius:18px;background:#0d0d0d;">
-              <p style="margin:0 0 6px 0;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#3b82f6;">
+          <div style="max-width:660px;margin:0 auto;padding:32px 20px;">
+            <div style="padding:24px;border:1px solid #1f2937;border-radius:20px;background:#0d0d0d;">
+              <p style="margin:0 0 8px 0;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#3b82f6;">
                 Qlyk Studio Auto
               </p>
-              <h1 style="margin:0;font-size:22px;line-height:1.3;color:#ffffff;">
-                ${isConcession ? 'Nouvelle demande concession' : 'Nouveau contact entrant'}
+              <h1 style="margin:0;font-size:24px;line-height:1.3;color:#ffffff;">
+                Nouvelle demande entrante
               </h1>
-              <p style="margin:10px 0 0 0;font-size:14px;line-height:1.6;color:#a3a3a3;">
-                Une nouvelle demande vient d’être envoyée depuis le site.
+              <p style="margin:12px 0 0 0;font-size:14px;line-height:1.7;color:#a3a3a3;">
+                Une demande vient d’être envoyée depuis le site.
               </p>
             </div>
 
-            <div style="margin-top:22px;padding:22px 24px;border:1px solid #1f2937;border-radius:18px;background:#111111;">
-              <h2 style="margin:0 0 16px 0;font-size:16px;color:#ffffff;">Type de demande</h2>
+            <div style="margin-top:22px;padding:24px;border:1px solid #1f2937;border-radius:20px;background:#111111;">
+              <h2 style="margin:0 0 14px 0;font-size:16px;color:#ffffff;">Type de demande</h2>
               <p style="margin:0;font-size:18px;font-weight:700;color:#3b82f6;">${safeOffer}</p>
             </div>
 
-            <div style="margin-top:22px;padding:22px 24px;border:1px solid #1f2937;border-radius:18px;background:#111111;">
+            <div style="margin-top:22px;padding:24px;border:1px solid #1f2937;border-radius:20px;background:#111111;">
               <h2 style="margin:0 0 16px 0;font-size:16px;color:#ffffff;">Informations client</h2>
               <p style="margin:0 0 10px 0;color:#d4d4d4;"><strong>Nom :</strong> ${firstName} ${lastName}</p>
               <p style="margin:0 0 10px 0;color:#d4d4d4;"><strong>Email :</strong> ${email}</p>
               <p style="margin:0 0 10px 0;color:#d4d4d4;"><strong>Téléphone :</strong> ${phone}</p>
-              <p style="margin:0 0 10px 0;color:#d4d4d4;"><strong>Société :</strong> ${company}</p>
-              <p style="margin:0 0 10px 0;color:#d4d4d4;"><strong>Volume mensuel :</strong> ${volume}</p>
+              <p style="margin:0 0 10px 0;color:#d4d4d4;"><strong>Société / garage :</strong> ${company}</p>
+              <p style="margin:0 0 10px 0;color:#d4d4d4;"><strong>Volume / besoin :</strong> ${volume}</p>
               <p style="margin:0;color:#d4d4d4;"><strong>Ville / secteur :</strong> ${location}</p>
             </div>
 
-            <div style="margin-top:22px;padding:22px 24px;border:1px solid #1f2937;border-radius:18px;background:#111111;">
+            <div style="margin-top:22px;padding:24px;border:1px solid #1f2937;border-radius:20px;background:#111111;">
               <h2 style="margin:0 0 16px 0;font-size:16px;color:#ffffff;">Message</h2>
-              <p style="margin:0;font-size:14px;line-height:1.7;color:#d4d4d4;">${message}</p>
+              <p style="margin:0;font-size:14px;line-height:1.8;color:#d4d4d4;">${message}</p>
             </div>
 
             <p style="margin:28px 0 0 0;font-size:12px;line-height:1.6;color:#737373;text-align:center;">
@@ -137,102 +138,25 @@ Notification automatique
 
     await sendMail({
       to: data.email,
-      subject: isConcession
-        ? 'Qlyk Studio Auto — Votre demande concession a bien été reçue'
-        : 'Qlyk Studio Auto — Votre demande a bien été reçue',
-      text: isConcession
-        ? `
-Bonjour ${data.firstName},
-
-Nous avons bien reçu votre demande concernant une production visuelle sur devis pour votre garage ou concession.
-
-Nous allons analyser votre besoin, votre volume, votre type de véhicules et votre usage des visuels afin de vous proposer une approche adaptée.
-
-Nous revenons vers vous rapidement pour échanger et préciser la suite.
-
-À très bientôt,
-
-Qlyk Studio Auto
-Studio visuel automobile premium
-        `
-        : `
-Bonjour ${data.firstName},
+      subject: 'Qlyk Studio Auto — Votre demande a bien été reçue',
+      text: `
+Bonjour ${firstNameRaw},
 
 Nous avons bien reçu votre demande.
 
-Offre sélectionnée : ${selectedOffer}
+Les informations transmises vont être étudiées avec attention afin de vous répondre de manière claire et adaptée.
 
-Notre équipe va analyser votre besoin et revenir vers vous rapidement.
-
-Chaque visuel est travaillé avec précision afin d’obtenir un rendu professionnel, réaliste et directement exploitable pour la mise en valeur de votre véhicule.
+Nous revenons vers vous rapidement avec la suite.
 
 À très bientôt,
 
 Qlyk Studio Auto
 Studio visuel automobile premium
-        `,
-      html: isConcession
-        ? `
+      `,
+      html: `
         <div style="margin:0;padding:0;background:#050505;font-family:Arial,Helvetica,sans-serif;color:#ffffff;">
-          <div style="max-width:640px;margin:0 auto;padding:32px 20px;">
-            <div style="padding:26px;border:1px solid #1f2937;border-radius:20px;background:#0d0d0d;">
-              <p style="margin:0 0 8px 0;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#3b82f6;">
-                Qlyk Studio Auto
-              </p>
-              <h1 style="margin:0;font-size:24px;line-height:1.3;color:#ffffff;">
-                Votre demande concession a bien été reçue
-              </h1>
-              <p style="margin:12px 0 0 0;font-size:14px;line-height:1.7;color:#a3a3a3;">
-                Production visuelle automobile premium sur devis
-              </p>
-            </div>
-
-            <div style="margin-top:24px;padding:26px;border:1px solid #1f2937;border-radius:20px;background:#111111;">
-              <p style="margin:0 0 18px 0;font-size:15px;line-height:1.7;color:#e5e5e5;">
-                Bonjour ${firstName},
-              </p>
-              <p style="margin:0 0 18px 0;font-size:15px;line-height:1.7;color:#e5e5e5;">
-                Nous avons bien reçu votre demande concernant une production visuelle sur devis pour votre garage ou concession.
-              </p>
-              <p style="margin:0 0 18px 0;font-size:15px;line-height:1.7;color:#e5e5e5;">
-                Nous allons analyser votre besoin, votre volume, votre type de véhicules et votre usage des visuels afin de vous proposer une approche adaptée à votre fonctionnement.
-              </p>
-              <p style="margin:0;font-size:15px;line-height:1.7;color:#e5e5e5;">
-                Nous revenons vers vous rapidement pour échanger et préciser la suite.
-              </p>
-            </div>
-
-            <div style="margin-top:24px;padding:22px 24px;border:1px solid #1f2937;border-radius:18px;background:#0d0d0d;">
-              <p style="margin:0 0 10px 0;font-size:14px;line-height:1.7;color:#d4d4d4;">
-                <strong style="color:#ffffff;">Votre demande concerne :</strong>
-              </p>
-              <p style="margin:0;font-size:14px;line-height:1.8;color:#a3a3a3;">
-                — Une production régulière ou sur mesure<br/>
-                — Une cohérence visuelle pour vos annonces<br/>
-                — Une mise en valeur professionnelle de vos véhicules<br/>
-                — Une approche respectueuse du véhicule d’origine
-              </p>
-            </div>
-
-            <div style="margin-top:28px;">
-              <p style="margin:0 0 6px 0;font-size:15px;color:#ffffff;">À très bientôt,</p>
-              <p style="margin:0;font-size:15px;line-height:1.7;color:#d4d4d4;">
-                <strong style="color:#ffffff;">Qlyk Studio Auto</strong><br/>
-                Studio visuel automobile premium<br/>
-                <span style="color:#737373;">Optimisation visuelle pour la vente de véhicules</span>
-              </p>
-            </div>
-
-            <p style="margin:28px 0 0 0;font-size:12px;line-height:1.6;color:#737373;text-align:center;">
-              Ceci est une confirmation automatique suite à votre demande.
-            </p>
-          </div>
-        </div>
-      `
-        : `
-        <div style="margin:0;padding:0;background:#050505;font-family:Arial,Helvetica,sans-serif;color:#ffffff;">
-          <div style="max-width:640px;margin:0 auto;padding:32px 20px;">
-            <div style="padding:26px 26px;border:1px solid #1f2937;border-radius:20px;background:#0d0d0d;text-align:left;">
+          <div style="max-width:660px;margin:0 auto;padding:32px 20px;">
+            <div style="padding:26px;border:1px solid #1f2937;border-radius:22px;background:#0d0d0d;">
               <p style="margin:0 0 8px 0;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#3b82f6;">
                 Qlyk Studio Auto
               </p>
@@ -244,29 +168,32 @@ Studio visuel automobile premium
               </p>
             </div>
 
-            <div style="margin-top:24px;padding:26px;border:1px solid #1f2937;border-radius:20px;background:#111111;">
+            <div style="margin-top:24px;padding:26px;border:1px solid #1f2937;border-radius:22px;background:#111111;">
               <p style="margin:0 0 18px 0;font-size:15px;line-height:1.7;color:#e5e5e5;">
                 Bonjour ${firstName},
               </p>
+
               <p style="margin:0 0 18px 0;font-size:15px;line-height:1.7;color:#e5e5e5;">
-                Nous avons bien reçu votre demande concernant l’offre <strong style="color:#ffffff;">${safeOffer}</strong>.
+                Nous avons bien reçu votre demande.
               </p>
+
               <p style="margin:0 0 18px 0;font-size:15px;line-height:1.7;color:#e5e5e5;">
-                Notre équipe va analyser les éléments transmis afin de vous accompagner avec un rendu professionnel, réaliste et adapté à la valorisation de votre véhicule.
+                Les informations transmises vont être étudiées avec attention afin de vous répondre de manière claire et adaptée.
               </p>
+
               <p style="margin:0;font-size:15px;line-height:1.7;color:#e5e5e5;">
-                Nous revenons vers vous rapidement avec la suite du traitement.
+                Nous revenons vers vous rapidement avec la suite.
               </p>
             </div>
 
-            <div style="margin-top:24px;padding:22px 24px;border:1px solid #1f2937;border-radius:18px;background:#0d0d0d;">
+            <div style="margin-top:24px;padding:22px 24px;border:1px solid #1f2937;border-radius:20px;background:#0d0d0d;">
               <p style="margin:0 0 10px 0;font-size:14px;line-height:1.7;color:#d4d4d4;">
                 <strong style="color:#ffffff;">Ce que nous garantissons :</strong>
               </p>
               <p style="margin:0;font-size:14px;line-height:1.8;color:#a3a3a3;">
-                — Un rendu visuel premium<br/>
-                — Une mise en valeur professionnelle<br/>
-                — Aucun changement du véhicule : forme, couleur, jantes et proportions sont respectées
+                — Une réponse claire et personnalisée<br/>
+                — Un traitement sérieux de votre demande<br/>
+                — Une approche visuelle professionnelle et respectueuse du véhicule d’origine
               </p>
             </div>
 

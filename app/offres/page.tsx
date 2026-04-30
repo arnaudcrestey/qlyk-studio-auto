@@ -76,8 +76,9 @@ const steps = [
     text: 'Une photo claire du véhicule suffit pour démarrer.'
   },
   {
-    title: 'Nous définissons les mises en scène',
-    text: 'Essentiel : 1 mise en scène. Pro : 3 visuels complémentaires adaptés au véhicule.'
+    title: 'Vous choisissez l'ambiance de presentation',
+    text: 'EConcession réaliste, extérieur valorisant, showroom premium ou parc automobile.
+👉 Nous adaptons la mise en scène pour structurer et valoriser votre véhicule.'
   },
   {
     title: 'Nous créons vos visuels',

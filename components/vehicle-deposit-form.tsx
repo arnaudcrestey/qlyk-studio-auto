@@ -217,38 +217,44 @@ export function VehicleDepositForm() {
         </div>
 
         <UploadDropzone
-          endpoint="vehiclePhotos"
-          onClientUploadComplete={(res) => {
-            const files = res.map((file) => ({
-              name: file.name,
-              url: file.url,
-              size: file.size
-            }));
+  endpoint="vehiclePhotos"
+  onClientUploadComplete={(res) => {
+    const files = res.map((file) => ({
+      name: file.name,
+      url: file.url,
+      size: file.size
+    }));
 
-            setUploadedFiles((currentFiles) => {
-              const nextFiles = [...currentFiles, ...files];
-              return nextFiles.slice(0, 3);
-            });
+    setUploadedFiles((currentFiles) => {
+      const nextFiles = [...currentFiles, ...files];
+      return nextFiles.slice(0, 3);
+    });
 
-            setStatus('idle');
-            setMessage('');
-          }}
-          onUploadError={(error: Error) => {
-            setStatus('error');
-            setMessage(error.message || 'Erreur pendant l’envoi des photos.');
-          }}
-          appearance={{
-            container:
-  'relative overflow-hidden rounded-3xl border border-dashed border-white/15 bg-[radial-gradient(circle_at_center,rgba(37,99,235,0.12),rgba(255,255,255,0.03)_38%,rgba(0,0,0,0.2)_100%)] p-8 transition-all duration-500 hover:border-premium/70 hover:bg-premium/[0.06] hover:shadow-[0_0_45px_rgba(37,99,235,0.35)] ut-uploading:border-premium ut-uploading:shadow-[0_0_60px_rgba(37,99,235,0.45)]',            label: 'text-foreground font-medium',
-            allowedContent: 'text-foreground/45 text-sm',
-            button:
-              'rounded-full bg-premium px-5 py-2 text-sm font-medium text-white ut-readying:bg-premium/70 ut-uploading:bg-premium/70'
-          }}
-          content={{
-            label: 'Glissez vos photos ici ou cliquez pour sélectionner',
-            allowedContent: 'Images uniquement — jusqu’à 3 fichiers de 8 Mo'
-          }}
-        />
+    setStatus('idle');
+    setMessage('');
+  }}
+  onUploadError={(error: Error) => {
+    setStatus('error');
+    setMessage(error.message || 'Erreur pendant l’envoi des photos.');
+  }}
+  appearance={{
+    container:
+      'qlyk-upload-zone group relative overflow-hidden rounded-3xl border border-dashed border-white/15 bg-[radial-gradient(circle_at_center,rgba(37,99,235,0.10),rgba(255,255,255,0.03)_40%,rgba(0,0,0,0.28)_100%)] p-10 transition-all duration-500 hover:border-premium/70 hover:shadow-[0_0_60px_rgba(37,99,235,0.4)] ut-uploading:border-premium ut-uploading:shadow-[0_0_80px_rgba(37,99,235,0.6)]',
+
+    label:
+      'text-foreground text-base font-medium transition-all duration-300 group-hover:text-white',
+
+    allowedContent:
+      'text-foreground/45 text-sm mt-2',
+
+    button:
+      'mt-5 rounded-full bg-premium px-6 py-2.5 text-sm font-medium text-white shadow-[0_0_20px_rgba(37,99,235,0.3)] transition-all duration-300 hover:shadow-[0_0_40px_rgba(37,99,235,0.6)] ut-uploading:opacity-70 ut-readying:opacity-70'
+  }}
+  content={{
+    label: 'Déposez votre véhicule comme en studio ou cliquez pour sélectionner',
+    allowedContent: 'JPG, PNG — jusqu’à 3 photos (8 Mo max)'
+  }}
+/>
 
         {uploadedFiles.length > 0 && (
           <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

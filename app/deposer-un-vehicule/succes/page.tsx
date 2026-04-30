@@ -32,25 +32,16 @@ export default function DepotVehiculeSuccesPage() {
             <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
               <Mail className="h-5 w-5 text-blue-300" />
               <h2 className="mt-4 text-sm font-semibold text-white">Confirmation envoyée</h2>
-              <p className="mt-2 text-xs leading-5 text-white/55">
-                Un email de confirmation vient de vous être adressé automatiquement.
-              </p>
             </div>
 
             <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
               <Clock3 className="h-5 w-5 text-blue-300" />
               <h2 className="mt-4 text-sm font-semibold text-white">Analyse de la demande</h2>
-              <p className="mt-2 text-xs leading-5 text-white/55">
-                Nous vérifions votre besoin, vos éléments transmis et la suite la plus adaptée.
-              </p>
             </div>
 
             <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
               <ShieldCheck className="h-5 w-5 text-blue-300" />
               <h2 className="mt-4 text-sm font-semibold text-white">Traitement soigné</h2>
-              <p className="mt-2 text-xs leading-5 text-white/55">
-                Chaque demande est traitée avec attention, sans modification du véhicule d’origine.
-              </p>
             </div>
           </div>
 
@@ -62,20 +53,6 @@ export default function DepotVehiculeSuccesPage() {
               >
                 Retour à l’accueil
                 <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-
-              <Link
-                href="/deposer-un-vehicule"
-                className="inline-flex h-12 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] px-7 text-sm font-medium text-white transition hover:border-blue-400/40 hover:bg-blue-500/10"
-              >
-                Déposer un véhicule
-              </Link>
-
-              <Link
-                href="/contact"
-                className="inline-flex h-12 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] px-7 text-sm font-medium text-white transition hover:border-blue-400/40 hover:bg-blue-500/10"
-              >
-                Nous contacter
               </Link>
             </div>
           </div>

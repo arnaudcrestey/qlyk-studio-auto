@@ -1,14 +1,20 @@
 import Link from 'next/link';
+import type { Route } from 'next';
 import { Car, ShieldCheck } from 'lucide-react';
 
-const navigationLinks = [
+type FooterLink = {
+  label: string;
+  href: Route;
+};
+
+const navigationLinks: FooterLink[] = [
   { label: 'Accueil', href: '/' },
   { label: 'Exemples', href: '/exemples' },
   { label: 'Offres', href: '/offres' },
   { label: 'Contact', href: '/contact' }
 ];
 
-const legalLinks = [
+const legalLinks: FooterLink[] = [
   { label: 'Mentions légales', href: '/mentions-legales' },
   { label: 'Politique de confidentialité', href: '/politique-de-confidentialite' },
   { label: 'Politique de cookies', href: '/politique-de-cookies' },
@@ -22,7 +28,6 @@ export function SiteFooter() {
 
       <div className="container-premium py-10 sm:py-12">
         <div className="grid gap-10 text-center sm:text-left md:grid-cols-[1.4fr_1fr_1fr] lg:gap-16">
-          {/* Marque */}
           <div className="mx-auto max-w-md space-y-4 sm:mx-0">
             <div className="flex items-center justify-center gap-2 text-white sm:justify-start">
               <Car className="h-4 w-4 text-blue-500" />
@@ -42,7 +47,6 @@ export function SiteFooter() {
             </div>
           </div>
 
-          {/* Navigation */}
           <div className="space-y-4">
             <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-white/35">
               Navigation
@@ -61,7 +65,6 @@ export function SiteFooter() {
             </nav>
           </div>
 
-          {/* Action */}
           <div className="space-y-4">
             <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-white/35">
               Démarrer
@@ -85,7 +88,6 @@ export function SiteFooter() {
           </div>
         </div>
 
-        {/* Liens légaux */}
         <div className="mt-10 border-t border-white/10 pt-6">
           <div className="flex flex-col gap-5 text-center text-xs text-white/35 md:flex-row md:items-center md:justify-between md:text-left">
             <p>

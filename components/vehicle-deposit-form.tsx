@@ -10,7 +10,7 @@ import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
-type UploadStatus = 'idle' | 'selecting' | 'uploading' | 'done' | 'error';
+type UploadStatus = 'idle' | 'ready' | 'uploading' | 'done' | 'error';
 type Offer = 'essentiel' | 'pro' | 'concession';
 
 type UploadedFile = {
@@ -59,7 +59,8 @@ export function VehicleDepositForm() {
     [selectedOffer]
   );
 
-  const isUploading = uploadStatus === 'uploading' || uploadStatus === 'selecting';
+  const isUploading = uploadStatus === 'uploading';
+  const isReadyToTransfer = uploadStatus === 'ready';
 
   function handleOfferChange(offer: Offer) {
     if (offer === 'concession') {
@@ -72,6 +73,14 @@ export function VehicleDepositForm() {
 
   function removeFile(url: string) {
     setUploadedFiles((files) => files.filter((file) => file.url !== url));
+  }
+
+  function markUploadReady() {
+    if (uploadStatus !== 'uploading') {
+      setUploadStatus('ready');
+      setMessage('Photo sélectionnée. Cliquez maintenant sur “Lancer le transfert”.');
+      setStatus('idle');
+    }
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -215,17 +224,22 @@ export function VehicleDepositForm() {
               Photos du véhicule
             </p>
             <p className="mt-1 text-sm leading-relaxed text-foreground/55">
-              Ajoutez jusqu’à 3 photos. Une confirmation apparaît dès que le chargement commence.
+              Sélectionnez vos photos, puis lancez le transfert pour les charger.
             </p>
           </div>
         </div>
 
-        <div className="relative">
+        <div
+          className="relative"
+          onClickCapture={markUploadReady}
+          onDropCapture={markUploadReady}
+          onDragEnterCapture={markUploadReady}
+        >
           <UploadDropzone
             endpoint="vehiclePhotos"
             onUploadBegin={() => {
               setUploadStatus('uploading');
-              setMessage('Chargement des photos en cours… restez sur cette page.');
+              setMessage('Transfert des photos en cours… restez sur cette page.');
               setStatus('idle');
             }}
             onClientUploadComplete={(res) => {
@@ -257,20 +271,27 @@ export function VehicleDepositForm() {
               allowedContent:
                 'text-foreground/45 text-sm mt-2',
               button:
-                'mt-5 rounded-full bg-premium px-7 py-3 text-sm font-semibold text-white shadow-[0_0_24px_rgba(37,99,235,0.35)] transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_45px_rgba(37,99,235,0.65)] ut-uploading:opacity-70 ut-readying:opacity-70'
+                `mt-5 rounded-full px-7 py-3 text-sm font-semibold text-white shadow-[0_0_24px_rgba(37,99,235,0.35)] transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_45px_rgba(37,99,235,0.65)] ut-uploading:opacity-70 ut-readying:opacity-70 ${
+                  isReadyToTransfer
+                    ? 'bg-green-500 hover:bg-green-400'
+                    : 'bg-premium'
+                }`
             }}
             content={{
-              label:
-                isUploading
-                  ? 'Chargement en cours…'
+              label: isUploading
+                ? 'Transfert en cours…'
+                : isReadyToTransfer
+                  ? 'Photo prête à être transférée'
                   : 'Glissez vos photos ici ou cliquez pour sélectionner',
-              allowedContent:
-                isUploading
-                  ? 'Veuillez patienter, vos photos sont en cours de transfert.'
+              allowedContent: isUploading
+                ? 'Veuillez patienter, vos photos sont en cours de transfert.'
+                : isReadyToTransfer
+                  ? 'Cliquez sur le bouton ci-dessous pour charger la photo.'
                   : 'JPG, PNG — jusqu’à 3 photos — 8 Mo max',
-              button:
-                isUploading
-                  ? 'Chargement...'
+              button: isUploading
+                ? 'Transfert en cours...'
+                : isReadyToTransfer
+                  ? 'Lancer le transfert'
                   : uploadedFiles.length > 0
                     ? 'Ajouter une autre photo'
                     : 'Choisir les photos'
@@ -284,7 +305,7 @@ export function VehicleDepositForm() {
               </div>
 
               <p className="mt-4 text-sm font-semibold text-white">
-                Photos en cours de chargement
+                Photos en cours de transfert
               </p>
 
               <p className="mt-2 max-w-sm text-center text-sm leading-relaxed text-white/55">
@@ -363,7 +384,7 @@ export function VehicleDepositForm() {
           {status === 'loading'
             ? 'Envoi en cours...'
             : isUploading
-              ? 'Chargement des photos...'
+              ? 'Transfert des photos...'
               : 'Continuer avec cette offre'}
         </Button>
       </div>

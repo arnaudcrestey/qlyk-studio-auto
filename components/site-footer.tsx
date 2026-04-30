@@ -1,25 +1,5 @@
 import Link from 'next/link';
-import type { Route } from 'next';
 import { Car, ShieldCheck } from 'lucide-react';
-
-type FooterLink = {
-  label: string;
-  href: Route;
-};
-
-const navigationLinks: FooterLink[] = [
-  { label: 'Accueil', href: '/' },
-  { label: 'Exemples', href: '/exemples' },
-  { label: 'Offres', href: '/offres' },
-  { label: 'Contact', href: '/contact' }
-];
-
-const legalLinks: FooterLink[] = [
-  { label: 'Mentions légales', href: '/mentions-legales' },
-  { label: 'Politique de confidentialité', href: '/politique-de-confidentialite' },
-  { label: 'Politique de cookies', href: '/politique-de-cookies' },
-  { label: 'Conditions générales', href: '/conditions-generales' }
-];
 
 export function SiteFooter() {
   return (
@@ -27,7 +7,8 @@ export function SiteFooter() {
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent" />
 
       <div className="container-premium py-10 sm:py-12">
-        <div className="grid gap-10 text-center sm:text-left md:grid-cols-[1.4fr_1fr_1fr] lg:gap-16">
+        <div className="grid gap-10 text-center sm:text-left md:grid-cols-3 md:gap-12">
+          {/* Marque */}
           <div className="mx-auto max-w-md space-y-4 sm:mx-0">
             <div className="flex items-center justify-center gap-2 text-white sm:justify-start">
               <Car className="h-4 w-4 text-blue-500" />
@@ -43,28 +24,33 @@ export function SiteFooter() {
 
             <div className="flex items-center justify-center gap-2 text-xs text-white/45 sm:justify-start">
               <ShieldCheck className="h-4 w-4 text-green-400" />
-              <span>Forme, couleur, jantes et proportions respectées.</span>
+              <span>Véhicule strictement respecté.</span>
             </div>
           </div>
 
+          {/* Navigation */}
           <div className="space-y-4">
             <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-white/35">
               Navigation
             </p>
 
             <nav className="flex flex-col items-center gap-3 text-sm text-white/60 sm:items-start">
-              {navigationLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="transition hover:text-white"
-                >
-                  {link.label}
-                </Link>
-              ))}
+              <Link href="/" className="transition hover:text-white">
+                Accueil
+              </Link>
+              <Link href="/exemples" className="transition hover:text-white">
+                Exemples
+              </Link>
+              <Link href="/offres" className="transition hover:text-white">
+                Offres
+              </Link>
+              <Link href="/contact" className="transition hover:text-white">
+                Contact
+              </Link>
             </nav>
           </div>
 
+          {/* Actions */}
           <div className="space-y-4">
             <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-white/35">
               Démarrer
@@ -88,6 +74,7 @@ export function SiteFooter() {
           </div>
         </div>
 
+        {/* Bas footer */}
         <div className="mt-10 border-t border-white/10 pt-6">
           <div className="flex flex-col gap-5 text-center text-xs text-white/35 md:flex-row md:items-center md:justify-between md:text-left">
             <p>
@@ -95,15 +82,21 @@ export function SiteFooter() {
             </p>
 
             <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 md:justify-end">
-              {legalLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="transition hover:text-white/70"
-                >
-                  {link.label}
-                </Link>
-              ))}
+              <a href="/mentions-legales" className="transition hover:text-white/70">
+                Mentions légales
+              </a>
+              <a
+                href="/politique-de-confidentialite"
+                className="transition hover:text-white/70"
+              >
+                Confidentialité
+              </a>
+              <a href="/politique-de-cookies" className="transition hover:text-white/70">
+                Cookies
+              </a>
+              <a href="/conditions-generales" className="transition hover:text-white/70">
+                Conditions générales
+              </a>
             </nav>
           </div>
         </div>

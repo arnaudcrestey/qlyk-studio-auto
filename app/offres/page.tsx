@@ -1,8 +1,22 @@
 import Link from 'next/link';
+import type { Route } from 'next';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
-const offers = [
+type Offer = {
+  title: string;
+  badge: string;
+  price: string;
+  priceNote: string;
+  description: string;
+  items: string[];
+  note?: string;
+  cta: string;
+  href: Route;
+  highlight: boolean;
+};
+
+const offers: Offer[] = [
   {
     title: 'Essentiel',
     badge: 'Pour démarrer',
@@ -151,7 +165,7 @@ export default function OffresPage() {
                   ))}
                 </ul>
 
-                {'note' in offer && offer.note && (
+                {offer.note && (
                   <p className="mt-5 rounded-2xl border border-premium/20 bg-premium/10 p-4 text-sm leading-relaxed text-foreground/70">
                     {offer.note}
                   </p>

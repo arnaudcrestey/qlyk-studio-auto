@@ -1,35 +1,83 @@
-@layer utilities {
-  .qlyk-upload-zone {
-    position: relative;
-    overflow: hidden;
-  }
+/* QLYK UPLOAD ZONE — VERSION STABLE */
 
-  .qlyk-upload-zone::before {
-    content: "";
-    position: absolute;
-    inset: -40%;
-    background:
-      radial-gradient(circle at center, rgba(37, 99, 235, 0.32), transparent 38%),
-      linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.28), transparent);
+.qlyk-upload-zone {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Halo lumineux central */
+.qlyk-upload-zone::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background:
+    radial-gradient(circle at center, rgba(37, 99, 235, 0.32), transparent 38%),
+    linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.25), transparent);
+  opacity: 0;
+  transform: translateX(-35%);
+  transition: opacity 0.4s ease, transform 0.7s ease;
+  pointer-events: none;
+}
+
+/* Activation hover / drag */
+.qlyk-upload-zone:hover::before {
+  opacity: 1;
+  transform: translateX(35%);
+}
+
+/* Ligne scanner auto */
+.qlyk-upload-zone::after {
+  content: "";
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: -20%;
+  width: 100px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(96, 165, 250, 0.15),
+    rgba(147, 197, 253, 0.6),
+    rgba(96, 165, 250, 0.15),
+    transparent
+  );
+  opacity: 0;
+  transform: skewX(-18deg);
+  filter: blur(1px);
+  pointer-events: none;
+}
+
+/* Animation scanner */
+.qlyk-upload-zone:hover::after {
+  opacity: 1;
+  animation: qlyk-scan 1.3s ease-in-out infinite;
+}
+
+/* Animation */
+@keyframes qlyk-scan {
+  0% {
+    left: -20%;
     opacity: 0;
-    transform: translateX(-30%);
-    transition: opacity 0.35s ease, transform 0.6s ease;
-    pointer-events: none;
   }
 
-  .qlyk-upload-zone:hover::before {
+  15% {
     opacity: 1;
-    transform: translateX(30%);
   }
 
-  .qlyk-upload-zone [data-ut-element="button"] {
-    position: relative;
-    z-index: 2;
+  70% {
+    opacity: 1;
   }
 
-  .qlyk-upload-zone [data-ut-element="label"],
-  .qlyk-upload-zone [data-ut-element="allowed-content"] {
-    position: relative;
-    z-index: 2;
+  100% {
+    left: 120%;
+    opacity: 0;
   }
+}
+
+/* Sécurité contenu (reste au-dessus des effets) */
+.qlyk-upload-zone [data-ut-element="button"],
+.qlyk-upload-zone [data-ut-element="label"],
+.qlyk-upload-zone [data-ut-element="allowed-content"] {
+  position: relative;
+  z-index: 2;
 }

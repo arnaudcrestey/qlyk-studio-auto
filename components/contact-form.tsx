@@ -1,7 +1,15 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
-import { ArrowRight, CheckCircle2, Loader2, Mail, Phone, ShieldCheck } from 'lucide-react';
+import {
+  ArrowRight,
+  CheckCircle2,
+  Image,
+  Loader2,
+  Mail,
+  ShieldCheck
+} from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,6 +17,8 @@ import { Textarea } from '@/components/ui/textarea';
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
 export function ContactForm() {
+  const router = useRouter();
+
   const [status, setStatus] = useState<Status>('idle');
   const [message, setMessage] = useState('');
 
@@ -37,8 +47,10 @@ export function ContactForm() {
       }
 
       setStatus('success');
-      setMessage('Votre demande a bien été envoyée. Nous revenons vers vous rapidement.');
+      setMessage('Demande envoyée. Nous revenons vers vous rapidement avec une réponse claire.');
       form.reset();
+
+      router.push('/deposer-un-vehicule/succes');
     } catch {
       setStatus('error');
       setMessage('Service momentanément indisponible. Veuillez réessayer.');
@@ -73,7 +85,7 @@ export function ContactForm() {
               <p className="text-sm font-medium text-blue-300">Premier échange</p>
 
               <h2 className="mt-3 font-serif text-3xl font-light text-white">
-                Une demande simple, une réponse qualifiée.
+                Vous nous expliquez votre besoin, nous vous disons ce qui est possible.
               </h2>
 
               <p className="mt-4 text-sm leading-6 text-white/60">
@@ -104,11 +116,11 @@ export function ContactForm() {
               </div>
 
               <div className="flex gap-3 rounded-2xl border border-white/10 bg-black/20 p-4">
-                <Phone className="mt-0.5 h-5 w-5 shrink-0 text-blue-300" />
+                <Image className="mt-0.5 h-5 w-5 shrink-0 text-blue-300" />
                 <div>
-                  <p className="text-sm font-semibold text-white">Échange direct</p>
+                  <p className="text-sm font-semibold text-white">Test possible rapidement</p>
                   <p className="mt-1 text-xs leading-5 text-white/55">
-                    Pour un test véhicule, une demande ponctuelle ou une production régulière.
+                    Vous pouvez commencer avec un premier véhicule avant d’aller plus loin.
                   </p>
                 </div>
               </div>
@@ -198,7 +210,7 @@ export function ContactForm() {
                 </>
               ) : (
                 <>
-                  Envoyer ma demande
+                  Envoyer la demande
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </>
               )}

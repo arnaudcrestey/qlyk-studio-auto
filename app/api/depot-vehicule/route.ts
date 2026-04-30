@@ -14,33 +14,23 @@ const offerLabels: Record<string, string> = {
   concession: 'Concession — sur devis'
 };
 
-function getOfferFromJson(json: unknown): string {
-  if (
-    typeof json === 'object' &&
-    json !== null &&
-    'offer' in json &&
-    typeof (json as { offer?: unknown }).offer === 'string'
-  ) {
-    const offer = (json as { offer: string }).offer;
-    return offerLabels[offer] || offer;
+function getOffer(json: any) {
+  if (json?.offer && typeof json.offer === 'string') {
+    return offerLabels[json.offer] || json.offer;
   }
-
   return 'Non renseignée';
 }
 
 export async function POST(request: Request) {
   try {
     const json = await request.json();
-    const selectedOffer = getOfferFromJson(json);
+    const selectedOffer = getOffer(json);
 
     const parsed = vehicleDepositSchema.safeParse(json);
 
     if (!parsed.success) {
       return NextResponse.json(
-        {
-          error: 'Validation invalide',
-          details: parsed.error.flatten().fieldErrors
-        },
+        { error: 'Validation invalide' },
         { status: 400 }
       );
     }
@@ -50,41 +40,113 @@ export async function POST(request: Request) {
 
     if (!recipient) {
       return NextResponse.json(
-        { error: 'Configuration email incomplète.' },
+        { error: 'MAIL_TO manquant' },
         { status: 500 }
       );
     }
 
     const uploadedFiles = data.uploadedFiles ?? [];
 
-    const photosText =
-      uploadedFiles.length > 0
-        ? uploadedFiles
-            .map((file, index) => `${index + 1}. ${file.name} — ${file.url}`)
-            .join('\n')
-        : 'Aucune photo transmise.';
+    const photosText = uploadedFiles.length
+      ? uploadedFiles.map((f, i) => `${i + 1}. ${f.name} — ${f.url}`).join('\n')
+      : 'Aucune photo';
 
-    const photosHtml =
-      uploadedFiles.length > 0
-        ? uploadedFiles
-            .map(
-              (file, index) =>
-                `<li style="margin-bottom:6px;">
-                  <a href="${file.url}" target="_blank" rel="noreferrer" style="color:#3b82f6;text-decoration:none;">
-                    Photo ${index + 1} — ${file.name}
-                  </a>
-                </li>`
-            )
-            .join('')
-        : '<li>Aucune photo transmise.</li>';
+    const photosHtml = uploadedFiles.length
+      ? uploadedFiles
+          .map(
+            (f, i) =>
+              `<li><a href="${f.url}" target="_blank">Photo ${i + 1} — ${f.name}</a></li>`
+          )
+          .join('')
+      : '<li>Aucune photo</li>';
 
+    // EMAIL ADMIN
     await sendMail({
       to: recipient,
-      subject: `Nouveau dépôt véhicule — ${data.brandModel}`,
-      text: [
-        `Offre sélectionnée: ${selectedOffer}`,
-        '',
-        `Nom: ${data.firstName} ${data.lastName}`,
+      subject: `Nouveau dépôt — ${data.brandModel}`,
+      text: `
+Offre : ${selectedOffer}
+
+Nom : ${data.firstName} ${data.lastName}
+Email : ${data.email}
+Téléphone : ${clean(data.phone)}
+
+Véhicule : ${data.brandModel}
+Année : ${clean(data.year)}
+Style : ${clean(data.style)}
+
+Photos :
+${photosText}
+
+Message :
+${clean(data.message)}
+      `,
+      html: `
+        <div style="font-family:Arial;background:#050505;color:#fff;padding:30px;">
+          <h2>Nouveau dépôt véhicule</h2>
+
+          <p><strong>Offre :</strong> ${selectedOffer}</p>
+
+          <p><strong>Nom :</strong> ${data.firstName} ${data.lastName}</p>
+          <p><strong>Email :</strong> ${data.email}</p>
+          <p><strong>Téléphone :</strong> ${clean(data.phone)}</p>
+
+          <p><strong>Véhicule :</strong> ${data.brandModel}</p>
+          <p><strong>Année :</strong> ${clean(data.year)}</p>
+          <p><strong>Style :</strong> ${clean(data.style)}</p>
+
+          <p><strong>Photos :</strong></p>
+          <ul>${photosHtml}</ul>
+
+          <p><strong>Message :</strong></p>
+          <p>${clean(data.message)}</p>
+        </div>
+      `
+    });
+
+    // EMAIL CLIENT
+    await sendMail({
+      to: data.email,
+      subject: 'Qlyk Studio Auto — Dépôt reçu',
+      text: `
+Bonjour ${data.firstName},
+
+Votre dépôt a bien été reçu.
+
+Offre : ${selectedOffer}
+Véhicule : ${data.brandModel}
+
+Nous revenons vers vous rapidement.
+
+Qlyk Studio Auto
+      `,
+      html: `
+        <div style="font-family:Arial;background:#050505;color:#fff;padding:30px;">
+          <h1>Qlyk Studio Auto</h1>
+
+          <p>Bonjour ${data.firstName},</p>
+
+          <p>Votre dépôt véhicule a bien été reçu.</p>
+
+          <p><strong>Offre :</strong> ${selectedOffer}</p>
+          <p><strong>Véhicule :</strong> ${data.brandModel}</p>
+
+          <p>Nous revenons vers vous rapidement.</p>
+
+          <p>— Qlyk Studio Auto</p>
+        </div>
+      `
+    });
+
+    return NextResponse.json({ success: true });
+
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Erreur serveur' },
+      { status: 500 }
+    );
+  }
+}        `Nom: ${data.firstName} ${data.lastName}`,
         `Email: ${data.email}`,
         `Téléphone: ${clean(data.phone)}`,
         `Concession: ${clean(data.dealership || data.garageName || data.company)}`,

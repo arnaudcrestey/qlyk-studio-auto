@@ -186,16 +186,7 @@ Studio visuel automobile premium
               </p>
             </div>
 
-            <div style="margin-top:24px;padding:22px 24px;border:1px solid #1f2937;border-radius:20px;background:#0d0d0d;">
-              <p style="margin:0 0 10px 0;font-size:14px;line-height:1.7;color:#d4d4d4;">
-                <strong style="color:#ffffff;">Ce que nous garantissons :</strong>
-              </p>
-              <p style="margin:0;font-size:14px;line-height:1.8;color:#a3a3a3;">
-                — Une réponse claire et personnalisée<br/>
-                — Un traitement sérieux de votre demande<br/>
-                — Une approche visuelle professionnelle et respectueuse du véhicule d’origine
-              </p>
-            </div>
+            
 
             <div style="margin-top:28px;">
               <p style="margin:0 0 6px 0;font-size:15px;color:#ffffff;">À très bientôt,</p>

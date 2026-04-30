@@ -23,12 +23,12 @@ const offerOptions = [
   {
     value: 'essentiel',
     label: 'Essentiel — 39€ HT',
-    description: '1 visuel premium pour tester la qualité Qlyk.'
+    description: '1 visuel premium prêt à vendre.'
   },
   {
     value: 'pro',
     label: 'Pro — 89€ HT',
-    description: '3 visuels complémentaires pour valoriser une annonce.'
+    description: '3 visuels premium pour valoriser une annonce.'
   },
   {
     value: 'concession',

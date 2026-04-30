@@ -5,18 +5,18 @@ import { Button } from '@/components/ui/button';
 const offers = [
   {
     title: 'Essentiel',
-    badge: 'Pour tester',
+    badge: 'Pour démarrer',
     price: '39€',
     priceNote: 'HT / véhicule',
-    description:
-      'Un visuel premium pour valoriser votre véhicule.',
+    description: 'Un visuel premium pour valoriser votre véhicule.',
     items: [
       '1 photo envoyée',
       '1 visuel premium optimisé',
       '1 mise en scène au choix',
       'livraison du visuel final'
     ],
-    cta: 'Tester avec mon véhicule',
+    cta: 'Créer mon visuel',
+    href: '/deposer-un-vehicule',
     highlight: false
   },
   {
@@ -24,8 +24,7 @@ const offers = [
     badge: 'Recommandé',
     price: '89€',
     priceNote: 'HT / véhicule',
-    description:
-      'Plusieurs visuels premium pour valoriser une annonce.',
+    description: 'Plusieurs visuels premium pour valoriser une annonce.',
     items: [
       '1 véhicule',
       '3 visuels complémentaires',
@@ -35,6 +34,7 @@ const offers = [
     note:
       'Idéal pour disposer d’un visuel principal et d’une variante du même véhicule.',
     cta: 'Créer mes visuels',
+    href: '/deposer-un-vehicule',
     highlight: true
   },
   {
@@ -51,6 +51,7 @@ const offers = [
       'suivi personnalisé'
     ],
     cta: 'Mettre en place le système',
+    href: '/contact',
     highlight: false
   }
 ];
@@ -106,18 +107,18 @@ export default function OffresPage() {
                   : 'border-white/10 bg-white/[0.03]'
               }`}
             >
-              {offer.highlight && (
-                <div className="absolute right-5 top-5 rounded-full border border-premium/40 bg-premium/15 px-3 py-1 text-xs font-medium text-premium">
-                  Recommandé
-                </div>
-              )}
-
               <div>
-                <p className="mb-5 inline-flex rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-foreground/60">
+                <p
+                  className={`mb-5 inline-flex rounded-full border px-3 py-1 text-xs ${
+                    offer.highlight
+                      ? 'border-premium/40 bg-premium/15 text-premium'
+                      : 'border-white/10 bg-white/[0.04] text-foreground/60'
+                  }`}
+                >
                   {offer.badge}
                 </p>
 
-                <h2 className="max-w-[85%] text-2xl font-semibold tracking-tight">
+                <h2 className="text-2xl font-semibold tracking-tight">
                   {offer.title}
                 </h2>
 
@@ -157,7 +158,7 @@ export default function OffresPage() {
                 )}
               </div>
 
-              <Link href="/deposer-un-vehicule" className="mt-8 block">
+              <Link href={offer.href} className="mt-8 block">
                 <Button className="h-12 w-full rounded-full text-sm font-medium sm:text-base">
                   {offer.cta}
                 </Button>

@@ -195,8 +195,7 @@ export function ContactForm() {
 
           <div className="flex flex-col gap-4 pt-2 sm:flex-row sm:items-center sm:justify-between">
             <p className="max-w-md text-xs leading-5 text-white/45">
-              Demande sans engagement. Vous recevez une réponse adaptée à votre situation,
-              sans promesse automatique ni modification du véhicule.
+              Demande sans engagement. 
             </p>
 
             <Button

@@ -69,10 +69,7 @@ export function SiteFooter() {
                 contact@qlykstudio.fr
               </a>
 
-              <p className="mt-3 text-xs leading-relaxed text-white/45">
-                Pour une demande concession, un besoin spécifique ou une question
-                avant dépôt.
-              </p>
+              
             </div>
           </div>
 

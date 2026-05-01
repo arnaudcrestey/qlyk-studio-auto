@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Car, ShieldCheck } from 'lucide-react';
+import { Car, Mail, ShieldCheck } from 'lucide-react';
 
 export function SiteFooter() {
   return (
@@ -7,9 +7,9 @@ export function SiteFooter() {
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent" />
 
       <div className="container-premium py-10 sm:py-12">
-        <div className="grid gap-10 text-center sm:text-left md:grid-cols-3 md:gap-12">
+        <div className="grid gap-10 text-center sm:text-left lg:grid-cols-4 lg:gap-12">
           {/* Marque */}
-          <div className="mx-auto max-w-md space-y-4 sm:mx-0">
+          <div className="mx-auto max-w-md space-y-4 sm:mx-0 lg:col-span-1">
             <div className="flex items-center justify-center gap-2 text-white sm:justify-start">
               <Car className="h-4 w-4 text-blue-500" />
               <span className="text-xs font-semibold uppercase tracking-[0.24em]">
@@ -50,6 +50,32 @@ export function SiteFooter() {
             </nav>
           </div>
 
+          {/* Contact */}
+          <div className="space-y-4">
+            <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-white/35">
+              Contact
+            </p>
+
+            <div className="mx-auto max-w-xs rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:mx-0">
+              <div className="flex items-center justify-center gap-2 text-sm font-medium text-white sm:justify-start">
+                <Mail className="h-4 w-4 text-blue-400" />
+                <span>Échange direct</span>
+              </div>
+
+              <a
+                href="mailto:contact@qlykstudio.fr"
+                className="mt-3 block break-all text-sm text-blue-300 transition hover:text-white"
+              >
+                contact@qlykstudio.fr
+              </a>
+
+              <p className="mt-3 text-xs leading-relaxed text-white/45">
+                Pour une demande concession, un besoin spécifique ou une question
+                avant dépôt.
+              </p>
+            </div>
+          </div>
+
           {/* Actions */}
           <div className="space-y-4">
             <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-white/35">
@@ -78,25 +104,32 @@ export function SiteFooter() {
         <div className="mt-10 border-t border-white/10 pt-6">
           <div className="flex flex-col gap-5 text-center text-xs text-white/35 md:flex-row md:items-center md:justify-between md:text-left">
             <p>
-              © {new Date().getFullYear()} Qlyk Studio Auto. Tous droits réservés.
+              © {new Date().getFullYear()} Qlyk Studio Auto. Tous droits
+              réservés.
             </p>
 
             <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 md:justify-end">
-              <a href="/mentions-legales" className="transition hover:text-white/70">
+              <Link href="/mentions-legales" className="transition hover:text-white/70">
                 Mentions légales
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/politique-de-confidentialite"
                 className="transition hover:text-white/70"
               >
                 Confidentialité
-              </a>
-              <a href="/politique-de-cookies" className="transition hover:text-white/70">
+              </Link>
+              <Link
+                href="/politique-de-cookies"
+                className="transition hover:text-white/70"
+              >
                 Cookies
-              </a>
-              <a href="/conditions-generales" className="transition hover:text-white/70">
+              </Link>
+              <Link
+                href="/conditions-generales"
+                className="transition hover:text-white/70"
+              >
                 Conditions générales
-              </a>
+              </Link>
             </nav>
           </div>
         </div>

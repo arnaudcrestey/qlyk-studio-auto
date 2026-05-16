@@ -33,7 +33,7 @@ const offerOptions = [
   {
     value: 'concession',
     label: 'volume— sur devis',
-  description: 'Production régulière pour plusieurs véhicules.'
+  description: 'Plusieurs véhicules ou besoin régulier.'
   }
 ] as const;
 

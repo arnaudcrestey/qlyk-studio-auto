@@ -32,8 +32,8 @@ const offerOptions = [
   },
   {
     value: 'concession',
-    label: 'Concession — sur devis',
-    description: 'Production régulière pour plusieurs véhicules.'
+    label: 'volume— sur devis',
+  description: 'Production régulière pour plusieurs véhicules.'
   }
 ] as const;
 
@@ -64,7 +64,7 @@ export function VehicleDepositForm() {
 
   function handleOfferChange(offer: Offer) {
     if (offer === 'concession') {
-      router.push('/contact?objet=concession');
+      router.push('/depot-volume');
       return;
     }
 

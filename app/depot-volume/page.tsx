@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { CheckCircle2, Loader2, UploadCloud, X } from 'lucide-react';
 import { UploadDropzone } from '@/lib/uploadthing';
 
-type Status = 'idle' | 'loading' | 'success' | 'error';
+type Status = 'idle' | 'loading' | 'error';
 type UploadStatus = 'idle' | 'ready' | 'uploading' | 'done' | 'error';
 
 type UploadedFile = {
@@ -32,13 +32,14 @@ export default function DepotVolumePage() {
   function markUploadReady() {
     if (uploadStatus !== 'uploading') {
       setUploadStatus('ready');
-      setMessage('Photos sélectionnées. Cliquez maintenant sur “Lancer le transfert”.');
       setStatus('idle');
+      setMessage('Photos sélectionnées. Cliquez maintenant sur “Lancer le transfert”.');
     }
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
     setStatus('loading');
     setMessage('');
 
@@ -71,8 +72,7 @@ export default function DepotVolumePage() {
         return;
       }
 
-      setStatus('success');
-setMessage('Dépôt envoyé avec succès.');
+      router.push('/depot-volume/succes');
     } catch (error) {
       console.error('DEPOT VOLUME ERROR:', error);
       setStatus('error');
@@ -166,8 +166,8 @@ setMessage('Dépôt envoyé avec succès.');
                 endpoint="volumePhotos"
                 onUploadBegin={() => {
                   setUploadStatus('uploading');
-                  setMessage('Transfert des photos en cours… restez sur cette page.');
                   setStatus('idle');
+                  setMessage('Transfert des photos en cours… restez sur cette page.');
                 }}
                 onClientUploadComplete={(res) => {
                   const files = res.map((file) => ({

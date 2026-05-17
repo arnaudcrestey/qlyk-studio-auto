@@ -251,7 +251,7 @@ export function VehicleDepositForm() {
 
               setUploadedFiles((currentFiles) => {
                 const nextFiles = [...currentFiles, ...files];
-                return nextFiles.slice(0, 3);
+                return nextFiles.slice(0, 6);
               });
 
               setUploadStatus('done');
@@ -287,7 +287,7 @@ export function VehicleDepositForm() {
                 ? 'Veuillez patienter, vos photos sont en cours de transfert.'
                 : isReadyToTransfer
                   ? 'Cliquez sur le bouton ci-dessous pour charger la photo.'
-                  : 'JPG, PNG — jusqu’à 3 photos — 8 Mo max',
+                  : 'JPG, PNG — jusqu’à 6 photos — 8 Mo max',
               button: isUploading
                 ? 'Transfert en cours...'
                 : isReadyToTransfer

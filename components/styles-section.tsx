@@ -4,7 +4,7 @@ const styles = [
   {
     title: 'Showroom premium',
     description: 'Présentation propre et nette, idéale pour un site de concession.',
-    image: '/images/peugeot-premium.jpg',
+    image: '/images/peugeot-signature.jpg',
   },
   {
     title: 'Concession réaliste',
@@ -14,7 +14,7 @@ const styles = [
   {
     title: 'Annonce optimisée',
     description: 'Visuel clair et impactant pour sites annonces.',
-    image: '/images/peugeot-signature.jpg',
+    image: '/images/peugeot-premium.jpg',
   },
 ];
 

@@ -71,7 +71,8 @@ export default function DepotVolumePage() {
         return;
       }
 
-      router.push('/depot-volume/succes');
+      setStatus('success');
+setMessage('Dépôt envoyé avec succès.');
     } catch (error) {
       console.error('DEPOT VOLUME ERROR:', error);
       setStatus('error');

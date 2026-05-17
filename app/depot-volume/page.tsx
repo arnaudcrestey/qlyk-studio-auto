@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { CheckCircle2, X } from 'lucide-react';
 import { UploadDropzone } from '@/lib/uploadthing';
 
 type UploadedFile = {
@@ -11,6 +12,10 @@ type UploadedFile = {
 
 export default function DepotVolumePage() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+
+  function removeFile(url: string) {
+    setUploadedFiles((files) => files.filter((file) => file.url !== url));
+  }
 
   return (
     <main className="min-h-screen w-full overflow-x-hidden bg-black px-4 py-12 text-white sm:px-6 sm:py-20">
@@ -32,10 +37,24 @@ export default function DepotVolumePage() {
 
         <div className="mt-10 w-full rounded-[28px] border border-white/10 bg-white/[0.035] p-5 shadow-[0_0_80px_rgba(37,99,235,0.12)] backdrop-blur sm:mt-14 sm:rounded-[34px] sm:p-8 lg:p-10">
           <div className="grid w-full gap-4 sm:grid-cols-2">
-            <input className="h-[58px] min-w-0 rounded-2xl border border-white/10 bg-black/40 px-5 text-[15px] text-white outline-none placeholder:text-white/35 focus:border-[#3b82f6]" placeholder="Nom / société" />
-            <input className="h-[58px] min-w-0 rounded-2xl border border-white/10 bg-black/40 px-5 text-[15px] text-white outline-none placeholder:text-white/35 focus:border-[#3b82f6]" placeholder="Email" />
-            <input className="h-[58px] min-w-0 rounded-2xl border border-white/10 bg-black/40 px-5 text-[15px] text-white outline-none placeholder:text-white/35 focus:border-[#3b82f6]" placeholder="Téléphone" />
-            <input className="h-[58px] min-w-0 rounded-2xl border border-white/10 bg-black/40 px-5 text-[15px] text-white outline-none placeholder:text-white/35 focus:border-[#3b82f6]" placeholder="Nombre de véhicules" />
+            <input
+              placeholder="Nom / société"
+              className="h-[58px] min-w-0 rounded-2xl border border-white/10 bg-black/40 px-5 text-[15px] text-white outline-none placeholder:text-white/35 focus:border-[#3b82f6]"
+            />
+            <input
+              type="email"
+              placeholder="Email"
+              className="h-[58px] min-w-0 rounded-2xl border border-white/10 bg-black/40 px-5 text-[15px] text-white outline-none placeholder:text-white/35 focus:border-[#3b82f6]"
+            />
+            <input
+              type="tel"
+              placeholder="Téléphone"
+              className="h-[58px] min-w-0 rounded-2xl border border-white/10 bg-black/40 px-5 text-[15px] text-white outline-none placeholder:text-white/35 focus:border-[#3b82f6]"
+            />
+            <input
+              placeholder="Nombre de véhicules"
+              className="h-[58px] min-w-0 rounded-2xl border border-white/10 bg-black/40 px-5 text-[15px] text-white outline-none placeholder:text-white/35 focus:border-[#3b82f6]"
+            />
           </div>
 
           <textarea
@@ -53,7 +72,7 @@ export default function DepotVolumePage() {
                   size: file.size,
                 }));
 
-                setUploadedFiles(files);
+                setUploadedFiles((current) => [...current, ...files].slice(0, 50));
               }}
               onUploadError={(error: Error) => {
                 alert(error.message || 'Erreur pendant le transfert des photos.');
@@ -69,14 +88,57 @@ export default function DepotVolumePage() {
               content={{
                 label: 'Zone de dépôt des visuels',
                 allowedContent: 'JPG, PNG — jusqu’à 50 photos — 8 Mo max par photo',
-                button: 'Choisir les photos',
+                button:
+                  uploadedFiles.length > 0
+                    ? 'Ajouter des photos'
+                    : 'Choisir les photos',
               }}
             />
           </div>
 
           {uploadedFiles.length > 0 && (
-            <div className="mt-5 rounded-2xl border border-green-400/25 bg-green-400/10 px-4 py-3 text-sm text-green-300">
-              {uploadedFiles.length} photo(s) chargée(s) avec succès.
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {uploadedFiles.map((file, index) => (
+                <div
+                  key={`${file.url}-${index}`}
+                  className="group overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] shadow-[0_0_35px_rgba(0,0,0,0.18)]"
+                >
+                  <div className="relative aspect-[4/3] overflow-hidden bg-black">
+                    <img
+                      src={file.url}
+                      alt={file.name}
+                      className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => removeFile(file.url)}
+                      className="absolute right-3 top-3 rounded-full bg-black/70 p-2 text-white backdrop-blur transition hover:bg-red-500"
+                      aria-label="Supprimer la photo"
+                    >
+                      <X size={16} />
+                    </button>
+
+                    <div className="absolute left-3 top-3 rounded-full bg-green-400/90 px-3 py-1 text-xs font-semibold text-black">
+                      Photo {index + 1}
+                    </div>
+
+                    <div className="absolute bottom-3 left-3 flex items-center gap-2 rounded-full bg-black/70 px-3 py-1.5 text-xs font-medium text-white backdrop-blur">
+                      <CheckCircle2 size={14} className="text-green-300" />
+                      Chargée
+                    </div>
+                  </div>
+
+                  <div className="p-4">
+                    <p className="truncate text-sm font-medium text-white">
+                      {file.name}
+                    </p>
+                    <p className="mt-1 text-xs text-white/45">
+                      Visuel prêt pour le dépôt volume
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 

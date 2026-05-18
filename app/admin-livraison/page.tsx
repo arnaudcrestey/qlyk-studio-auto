@@ -44,6 +44,7 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
 
   async function copyDeliveryLink() {
     if (!deliveryUrl) return;
+
     await navigator.clipboard.writeText(deliveryUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 1800);
@@ -51,6 +52,7 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
 
   async function copyCodeBlock() {
     if (!codeToCopy) return;
+
     await navigator.clipboard.writeText(codeToCopy);
     setCopied(true);
     setTimeout(() => setCopied(false), 1800);
@@ -69,8 +71,8 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
           </h1>
 
           <p className="mt-5 max-w-2xl text-white/65">
-            Déposez les visuels finaux, récupérez les URLs UploadThing, puis
-            générez le lien privé à transmettre au client.
+            Déposez les visuels finaux, lancez le transfert, puis récupérez le
+            lien privé à transmettre au client.
           </p>
         </div>
 
@@ -109,6 +111,9 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
 
               <UploadDropzone
                 endpoint="deliveryPhotos"
+                config={{
+                  mode: "manual",
+                }}
                 onClientUploadComplete={(res) => {
                   if (!res) return;
 
@@ -130,14 +135,18 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
                   label: "text-white text-base font-medium",
                   allowedContent: "text-white/45 text-sm",
                   button:
-                    "bg-blue-600 text-white rounded-2xl px-6 py-3 hover:bg-blue-500 transition",
+                    "bg-[#16a34a] text-white rounded-2xl px-6 py-3 hover:bg-[#22c55e] transition",
                 }}
                 content={{
-                  label: "Déposer les visuels finaux",
+                  label: "Photo prête à être transférée",
                   allowedContent:
-                    "Images uniquement — jusqu’à 20 fichiers — 8 Mo max par photo",
-                  button({ ready }) {
-                    return ready ? "Choisir les photos" : "Chargement...";
+                    "Sélectionnez vos visuels, puis lancez le transfert.",
+                  button({ ready, isUploading, uploadProgress }) {
+                    if (isUploading) {
+                      return `Transfert ${uploadProgress}%`;
+                    }
+
+                    return ready ? "Lancer le transfert" : "Chargement...";
                   },
                 }}
               />
@@ -176,7 +185,9 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
 
                         <button
                           type="button"
-                          onClick={() => navigator.clipboard.writeText(file.url)}
+                          onClick={() =>
+                            navigator.clipboard.writeText(file.url)
+                          }
                           className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2 text-xs text-white transition hover:bg-white/15"
                         >
                           <Copy className="h-3.5 w-3.5" />
@@ -244,7 +255,9 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
               ) : (
                 <Copy className="h-4 w-4" />
               )}
+
               {copied ? "Copié" : "Copier le lien de livraison"}
+
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>

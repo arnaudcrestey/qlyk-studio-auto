@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     const photosHtml = uploadedFiles
       .map(
         (file, index) =>
-          `<li><a href="${file.url}" target="_blank" rel="noreferrer">Photo ${index + 1} — ${file.name}</a></li>`
+          `<li style="margin:0 0 8px 0;color:#374151;"><a href="${file.url}" target="_blank" rel="noreferrer" style="color:#2563eb;text-decoration:underline;">Photo ${index + 1} — ${file.name}</a></li>`
       )
       .join('');
 
@@ -64,34 +64,49 @@ Message :
 ${clean(data.message)}
 `,
       html: `
-        <div style="font-family:Arial,sans-serif;background:#050505;color:#ffffff;padding:30px;">
-          <div style="max-width:620px;margin:auto;">
-            <p style="font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#3b82f6;margin:0 0 8px;">
-              Qlyk Studio Auto
-            </p>
+        <div style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+          <div style="max-width:620px;margin:0 auto;padding:30px 20px;">
 
-            <h2 style="margin:0 0 24px;font-size:24px;">
-              Nouveau dépôt volume
-            </h2>
+            <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:16px;padding:24px;margin-bottom:18px;">
+              <p style="font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#2563eb;margin:0 0 8px 0;">
+                Qlyk Studio Auto
+              </p>
 
-            <div style="background:#111;padding:20px;border-radius:12px;margin-bottom:18px;">
-              <p><strong>Société :</strong> ${clean(data.company)}</p>
-              <p><strong>Email :</strong> ${clean(data.email)}</p>
-              <p><strong>Téléphone :</strong> ${clean(data.phone)}</p>
-              <p><strong>Nombre de véhicules :</strong> ${clean(data.vehicleCount)}</p>
+              <h2 style="margin:0;font-size:24px;line-height:1.3;color:#111111;">
+                Nouveau dépôt volume
+              </h2>
+
+              <p style="margin:12px 0 0 0;font-size:14px;line-height:1.7;color:#4b5563;">
+                Un dépôt multi-véhicules vient d’être transmis depuis le site.
+              </p>
             </div>
 
-            <div style="background:#111;padding:20px;border-radius:12px;margin-bottom:18px;">
-              <p><strong>Photos transmises :</strong></p>
-              <ul>${photosHtml}</ul>
+            <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:16px;padding:20px;margin-bottom:18px;">
+              <p style="margin:0 0 10px 0;color:#374151;"><strong style="color:#111111;">Société :</strong> ${clean(data.company)}</p>
+              <p style="margin:0 0 10px 0;color:#374151;"><strong style="color:#111111;">Email :</strong> ${clean(data.email)}</p>
+              <p style="margin:0 0 10px 0;color:#374151;"><strong style="color:#111111;">Téléphone :</strong> ${clean(data.phone)}</p>
+              <p style="margin:0;color:#374151;"><strong style="color:#111111;">Nombre de véhicules :</strong> ${clean(data.vehicleCount)}</p>
             </div>
 
-            <div style="background:#111;padding:20px;border-radius:12px;">
-              <p><strong>Message :</strong></p>
-              <p>${clean(data.message)}</p>
+            <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:16px;padding:20px;margin-bottom:18px;">
+              <p style="margin:0 0 12px 0;color:#111111;">
+                <strong>Photos transmises :</strong>
+              </p>
+              <ul style="margin:0;padding-left:20px;color:#374151;">
+                ${photosHtml}
+              </ul>
             </div>
 
-            <p style="margin-top:28px;font-size:12px;color:#777;">
+            <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:16px;padding:20px;">
+              <p style="margin:0 0 12px 0;color:#111111;">
+                <strong>Message :</strong>
+              </p>
+              <p style="margin:0;font-size:14px;line-height:1.8;color:#374151;">
+                ${clean(data.message)}
+              </p>
+            </div>
+
+            <p style="margin:28px 0 0 0;font-size:12px;line-height:1.6;color:#6b7280;text-align:center;">
               Qlyk Studio Auto — Notification automatique
             </p>
           </div>

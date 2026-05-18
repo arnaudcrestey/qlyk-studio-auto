@@ -1,5 +1,7 @@
+import Image from "next/image";
 import Link from "next/link";
-import { Download, ImageIcon, ShieldCheck } from "lucide-react";
+import { notFound } from "next/navigation";
+import { getQlykDelivery } from "@/lib/qlyk-deliveries";
 
 type PageProps = {
   params: Promise<{
@@ -9,69 +11,87 @@ type PageProps = {
 
 export default async function LivraisonClientPage({ params }: PageProps) {
   const { slug } = await params;
+  const delivery = getQlykDelivery(slug);
 
-  const clientSlug = slug.replaceAll("-", " ");
+  if (!delivery) {
+    notFound();
+  }
 
   return (
-    <main className="min-h-screen bg-[#050816] text-white">
-      <section className="mx-auto w-full max-w-6xl px-6 py-20 sm:px-8 lg:px-12">
-        <div className="mb-10">
-          <Link
-            href="/livraison"
-            className="text-sm text-blue-300 hover:text-blue-200"
-          >
-            ← Retour livraison
-          </Link>
+    <main className="min-h-screen bg-[#050816] px-5 py-10 text-white">
+      <section className="mx-auto w-full max-w-6xl">
+        <div className="mb-10 rounded-3xl border border-white/10 bg-white/[0.04] p-6 shadow-2xl">
+          <p className="mb-3 text-sm uppercase tracking-[0.35em] text-white/50">
+            QLYK Studio Auto
+          </p>
 
-          <div className="mt-8 inline-flex items-center rounded-full border border-blue-500/20 bg-blue-500/10 px-4 py-2 text-sm text-blue-200">
-            Livraison privée QLYK
-          </div>
-
-          <h1 className="mt-6 text-4xl font-semibold tracking-tight sm:text-5xl">
-            Vos visuels sont prêts
+          <h1 className="text-3xl font-semibold tracking-tight md:text-5xl">
+            Livraison de vos visuels
           </h1>
 
-          <p className="mt-5 max-w-2xl text-white/65">
-            Espace de livraison privé pour :{" "}
-            <span className="capitalize text-white">{clientSlug}</span>
+          <p className="mt-4 max-w-2xl text-white/65">
+            Votre sélection finale est prête. Vous pouvez consulter et
+            télécharger vos visuels haute qualité.
           </p>
+
+          <div className="mt-8 grid gap-4 sm:grid-cols-3">
+            <InfoCard label="Client" value={delivery.clientName} />
+            <InfoCard label="Véhicule" value={delivery.vehicle} />
+            <InfoCard label="Livraison" value={delivery.deliveredAt} />
+          </div>
         </div>
 
-        <div className="grid gap-5 md:grid-cols-3">
-          {[1, 2, 3].map((item) => (
-            <div
-              key={item}
-              className="flex aspect-[4/3] items-center justify-center rounded-3xl border border-white/10 bg-white/5"
+        <div className="grid gap-6 md:grid-cols-2">
+          {delivery.photos.map((photo, index) => (
+            <article
+              key={photo}
+              className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04]"
             >
-              <div className="text-center">
-                <ImageIcon className="mx-auto h-10 w-10 text-blue-300" />
-                <p className="mt-3 text-sm text-white/50">
-                  Photo finale {item}
-                </p>
+              <div className="relative aspect-[4/3] w-full">
+                <Image
+                  src={photo}
+                  alt={`Visuel livré ${index + 1}`}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
               </div>
-            </div>
+
+              <div className="flex items-center justify-between gap-4 p-4">
+                <span className="text-sm text-white/60">
+                  Visuel {index + 1}
+                </span>
+
+                <a
+                  href={photo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-full bg-white px-4 py-2 text-sm font-medium text-[#050816] transition hover:bg-white/90"
+                >
+                  Télécharger
+                </a>
+              </div>
+            </article>
           ))}
         </div>
 
-        <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-6">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex gap-4">
-              <ShieldCheck className="mt-1 h-5 w-5 text-blue-300" />
-              <div>
-                <h2 className="font-medium">Livraison sécurisée</h2>
-                <p className="mt-1 text-sm text-white/55">
-                  Les fichiers définitifs seront reliés ici via Supabase.
-                </p>
-              </div>
-            </div>
-
-            <button className="inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-600 px-6 py-4 text-sm font-medium text-white">
-              <Download className="h-4 w-4" />
-              Télécharger les visuels
-            </button>
-          </div>
+        <div className="mt-10 text-center">
+          <Link href="/livraison" className="text-sm text-white/50 hover:text-white">
+            Retour à l’espace livraison
+          </Link>
         </div>
       </section>
     </main>
+  );
+}
+
+function InfoCard({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+      <p className="text-xs uppercase tracking-[0.25em] text-white/40">
+        {label}
+      </p>
+      <p className="mt-2 text-sm font-medium text-white">{value}</p>
+    </div>
   );
 }

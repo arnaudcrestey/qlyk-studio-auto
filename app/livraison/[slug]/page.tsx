@@ -2,19 +2,24 @@ import Link from "next/link";
 import { Download, ImageIcon, ShieldCheck } from "lucide-react";
 
 type PageProps = {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 };
 
-export default function LivraisonClientPage({ params }: PageProps) {
-  const clientSlug = params.slug.replaceAll("-", " ");
+export default async function LivraisonClientPage({ params }: PageProps) {
+  const { slug } = await params;
+
+  const clientSlug = slug.replaceAll("-", " ");
 
   return (
     <main className="min-h-screen bg-[#050816] text-white">
       <section className="mx-auto w-full max-w-6xl px-6 py-20 sm:px-8 lg:px-12">
         <div className="mb-10">
-          <Link href="/livraison" className="text-sm text-blue-300 hover:text-blue-200">
+          <Link
+            href="/livraison"
+            className="text-sm text-blue-300 hover:text-blue-200"
+          >
             ← Retour livraison
           </Link>
 
@@ -40,7 +45,9 @@ export default function LivraisonClientPage({ params }: PageProps) {
             >
               <div className="text-center">
                 <ImageIcon className="mx-auto h-10 w-10 text-blue-300" />
-                <p className="mt-3 text-sm text-white/50">Photo finale {item}</p>
+                <p className="mt-3 text-sm text-white/50">
+                  Photo finale {item}
+                </p>
               </div>
             </div>
           ))}

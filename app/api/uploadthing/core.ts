@@ -28,6 +28,19 @@ export const ourFileRouter = {
       size: file.size,
     };
   }),
+
+  deliveryPhotos: f({
+    image: {
+      maxFileSize: '8MB',
+      maxFileCount: 20,
+    },
+  }).onUploadComplete(async ({ file }) => {
+    return {
+      url: file.url,
+      name: file.name,
+      size: file.size,
+    };
+  }),
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof ourFileRouter;

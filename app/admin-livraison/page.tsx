@@ -1,14 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
-  ImageIcon,
-  ShieldCheck,
   ArrowRight,
-  Copy,
   CheckCircle2,
+  Copy,
+  ImageIcon,
+  Loader2,
+  ShieldCheck,
+  UploadCloud,
 } from "lucide-react";
-import { UploadDropzone } from "@/lib/uploadthing";
+import { useUploadThing } from "@/lib/uploadthing";
 
 type UploadedVisual = {
   name: string;
@@ -17,9 +19,32 @@ type UploadedVisual = {
 };
 
 export default function AdminLivraisonPage() {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
   const [slug, setSlug] = useState("");
-  const [copied, setCopied] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedVisual[]>([]);
+  const [copied, setCopied] = useState(false);
+
+  const { startUpload, isUploading } = useUploadThing("deliveryPhotos", {
+    onClientUploadComplete: (res) => {
+      if (!res) return;
+
+      setUploadedFiles((current) => [
+        ...current,
+        ...res.map((file) => ({
+          name: file.name,
+          url: file.url,
+          size: file.size,
+        })),
+      ]);
+
+      setSelectedFiles([]);
+    },
+    onUploadError: (error) => {
+      alert(`Erreur upload : ${error.message}`);
+    },
+  });
 
   const cleanSlug = slug.trim();
 
@@ -42,18 +67,20 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
 },`;
   }, [cleanSlug, uploadedFiles]);
 
-  async function copyDeliveryLink() {
-    if (!deliveryUrl) return;
-
-    await navigator.clipboard.writeText(deliveryUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1800);
+  function handleSelectFiles(event: React.ChangeEvent<HTMLInputElement>) {
+    if (!event.target.files) return;
+    setSelectedFiles(Array.from(event.target.files));
   }
 
-  async function copyCodeBlock() {
-    if (!codeToCopy) return;
+  async function handleStartUpload() {
+    if (selectedFiles.length === 0) return;
+    await startUpload(selectedFiles);
+  }
 
-    await navigator.clipboard.writeText(codeToCopy);
+  async function copyText(text: string) {
+    if (!text) return;
+
+    await navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 1800);
   }
@@ -71,8 +98,8 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
           </h1>
 
           <p className="mt-5 max-w-2xl text-white/65">
-            Déposez les visuels finaux, lancez le transfert, puis récupérez le
-            lien privé à transmettre au client.
+            Choisissez les visuels finaux, lancez le transfert, puis récupérez
+            le lien privé à transmettre au client.
           </p>
         </div>
 
@@ -87,9 +114,9 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
                 type="text"
                 placeholder="bmw-x5-garage-martin"
                 value={slug}
-                onChange={(e) =>
+                onChange={(event) =>
                   setSlug(
-                    e.target.value
+                    event.target.value
                       .toLowerCase()
                       .trim()
                       .replace(/\s+/g, "-")
@@ -104,52 +131,76 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
               </p>
             </div>
 
-            <div>
-              <label className="mb-3 block text-sm font-medium text-white/80">
-                Photos finales
-              </label>
+            <div className="rounded-3xl border border-white/10 bg-[#0b1220] p-5">
+              <div className="mb-4 flex items-start gap-4">
+                <div className="rounded-2xl border border-blue-500/30 bg-blue-500/10 p-3">
+                  <UploadCloud className="h-5 w-5 text-blue-300" />
+                </div>
 
-              <UploadDropzone
-                endpoint="deliveryPhotos"
-                config={{
-                  mode: "manual",
-                }}
-                onClientUploadComplete={(res) => {
-                  if (!res) return;
+                <div>
+                  <h2 className="font-medium text-white">Photos finales</h2>
+                  <p className="mt-1 text-sm text-white/50">
+                    Choisissez les photos, puis lancez le transfert.
+                  </p>
+                </div>
+              </div>
 
-                  setUploadedFiles((current) => [
-                    ...current,
-                    ...res.map((file) => ({
-                      name: file.name,
-                      url: file.url,
-                      size: file.size,
-                    })),
-                  ]);
-                }}
-                onUploadError={(error: Error) => {
-                  alert(`Erreur upload : ${error.message}`);
-                }}
-                appearance={{
-                  container:
-                    "rounded-3xl border border-dashed border-white/15 bg-[#0b1220] px-8 py-14 transition hover:border-blue-500/40 hover:bg-[#10192c]",
-                  label: "text-white text-base font-medium",
-                  allowedContent: "text-white/45 text-sm",
-                  button:
-                    "bg-[#16a34a] text-white rounded-2xl px-6 py-3 hover:bg-[#22c55e] transition",
-                }}
-                content={{
-                  label: "Photo prête à être transférée",
-                  allowedContent:
-                    "Sélectionnez vos visuels, puis lancez le transfert.",
-                  button({ ready, isUploading, uploadProgress }) {
-                    if (isUploading) {
-                      return `Transfert ${uploadProgress}%`;
-                    }
-
-                    return ready ? "Lancer le transfert" : "Chargement...";
-                  },
-                }}
+              <input
+                ref={inputRef}
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleSelectFiles}
+                className="hidden"
               />
+
+              <div className="rounded-3xl border border-dashed border-white/15 bg-black/20 px-6 py-12 text-center">
+                <UploadCloud className="mx-auto h-10 w-10 text-white" />
+
+                <p className="mt-5 font-medium text-white">
+                  {selectedFiles.length > 0
+                    ? `${selectedFiles.length} photo(s) sélectionnée(s)`
+                    : "Aucune photo sélectionnée"}
+                </p>
+
+                <p className="mt-2 text-sm text-white/45">
+                  JPG, PNG — jusqu’à 20 fichiers — 8 Mo max par photo
+                </p>
+
+                <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                  <button
+                    type="button"
+                    onClick={() => inputRef.current?.click()}
+                    disabled={isUploading}
+                    className="inline-flex items-center justify-center rounded-2xl bg-blue-600 px-6 py-3 text-sm font-medium text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Choisir les photos
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleStartUpload}
+                    disabled={selectedFiles.length === 0 || isUploading}
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#16a34a] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#22c55e] disabled:cursor-not-allowed disabled:bg-[#16a34a]/40 disabled:opacity-50"
+                  >
+                    {isUploading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Transfert en cours...
+                      </>
+                    ) : (
+                      "Lancer le transfert"
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {selectedFiles.length > 0 && (
+                <div className="mt-5 rounded-2xl border border-green-500/20 bg-green-500/10 px-4 py-3 text-sm text-green-200">
+                  Photo sélectionnée. Cliquez maintenant sur “Lancer le
+                  transfert”.
+                </div>
+              )}
             </div>
 
             {uploadedFiles.length > 0 && (
@@ -185,9 +236,7 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
 
                         <button
                           type="button"
-                          onClick={() =>
-                            navigator.clipboard.writeText(file.url)
-                          }
+                          onClick={() => copyText(file.url)}
                           className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2 text-xs text-white transition hover:bg-white/15"
                         >
                           <Copy className="h-3.5 w-3.5" />
@@ -212,7 +261,7 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
 
                 <button
                   type="button"
-                  onClick={copyCodeBlock}
+                  onClick={() => copyText(codeToCopy)}
                   className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-medium text-[#050816] transition hover:bg-white/90"
                 >
                   <Copy className="h-4 w-4" />
@@ -247,7 +296,7 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
             <button
               type="button"
               disabled={!deliveryUrl || uploadedFiles.length === 0}
-              onClick={copyDeliveryLink}
+              onClick={() => copyText(deliveryUrl)}
               className="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-6 py-4 text-sm font-medium text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-blue-600/40 disabled:opacity-50"
             >
               {copied ? (

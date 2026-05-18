@@ -94,41 +94,52 @@ Qlyk Studio Auto
 Notification automatique
       `,
       html: `
-        <div style="margin:0;padding:0;background:#050505;font-family:Arial,Helvetica,sans-serif;color:#ffffff;">
+        <div style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,Helvetica,sans-serif;color:#111111;">
           <div style="max-width:660px;margin:0 auto;padding:32px 20px;">
-            <div style="padding:24px;border:1px solid #1f2937;border-radius:20px;background:#0d0d0d;">
-              <p style="margin:0 0 8px 0;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#3b82f6;">
+            
+            <div style="padding:24px;border:1px solid #e5e7eb;border-radius:20px;background:#ffffff;">
+              <p style="margin:0 0 8px 0;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#2563eb;">
                 Qlyk Studio Auto
               </p>
-              <h1 style="margin:0;font-size:24px;line-height:1.3;color:#ffffff;">
+              <h1 style="margin:0;font-size:24px;line-height:1.3;color:#111111;">
                 Nouvelle demande entrante
               </h1>
-              <p style="margin:12px 0 0 0;font-size:14px;line-height:1.7;color:#a3a3a3;">
+              <p style="margin:12px 0 0 0;font-size:14px;line-height:1.7;color:#4b5563;">
                 Une demande vient d’être envoyée depuis le site.
               </p>
             </div>
 
-            <div style="margin-top:22px;padding:24px;border:1px solid #1f2937;border-radius:20px;background:#111111;">
-              <h2 style="margin:0 0 14px 0;font-size:16px;color:#ffffff;">Type de demande</h2>
-              <p style="margin:0;font-size:18px;font-weight:700;color:#3b82f6;">${safeOffer}</p>
+            <div style="margin-top:22px;padding:24px;border:1px solid #e5e7eb;border-radius:20px;background:#ffffff;">
+              <h2 style="margin:0 0 14px 0;font-size:16px;color:#111111;">
+                Type de demande
+              </h2>
+              <p style="margin:0;font-size:18px;font-weight:700;color:#2563eb;">
+                ${safeOffer}
+              </p>
             </div>
 
-            <div style="margin-top:22px;padding:24px;border:1px solid #1f2937;border-radius:20px;background:#111111;">
-              <h2 style="margin:0 0 16px 0;font-size:16px;color:#ffffff;">Informations client</h2>
-              <p style="margin:0 0 10px 0;color:#d4d4d4;"><strong>Nom :</strong> ${firstName} ${lastName}</p>
-              <p style="margin:0 0 10px 0;color:#d4d4d4;"><strong>Email :</strong> ${email}</p>
-              <p style="margin:0 0 10px 0;color:#d4d4d4;"><strong>Téléphone :</strong> ${phone}</p>
-              <p style="margin:0 0 10px 0;color:#d4d4d4;"><strong>Société / garage :</strong> ${company}</p>
-              <p style="margin:0 0 10px 0;color:#d4d4d4;"><strong>Volume / besoin :</strong> ${volume}</p>
-              <p style="margin:0;color:#d4d4d4;"><strong>Ville / secteur :</strong> ${location}</p>
+            <div style="margin-top:22px;padding:24px;border:1px solid #e5e7eb;border-radius:20px;background:#ffffff;">
+              <h2 style="margin:0 0 16px 0;font-size:16px;color:#111111;">
+                Informations client
+              </h2>
+              <p style="margin:0 0 10px 0;color:#374151;"><strong style="color:#111111;">Nom :</strong> ${firstName} ${lastName}</p>
+              <p style="margin:0 0 10px 0;color:#374151;"><strong style="color:#111111;">Email :</strong> ${email}</p>
+              <p style="margin:0 0 10px 0;color:#374151;"><strong style="color:#111111;">Téléphone :</strong> ${phone}</p>
+              <p style="margin:0 0 10px 0;color:#374151;"><strong style="color:#111111;">Société / garage :</strong> ${company}</p>
+              <p style="margin:0 0 10px 0;color:#374151;"><strong style="color:#111111;">Volume / besoin :</strong> ${volume}</p>
+              <p style="margin:0;color:#374151;"><strong style="color:#111111;">Ville / secteur :</strong> ${location}</p>
             </div>
 
-            <div style="margin-top:22px;padding:24px;border:1px solid #1f2937;border-radius:20px;background:#111111;">
-              <h2 style="margin:0 0 16px 0;font-size:16px;color:#ffffff;">Message</h2>
-              <p style="margin:0;font-size:14px;line-height:1.8;color:#d4d4d4;">${message}</p>
+            <div style="margin-top:22px;padding:24px;border:1px solid #e5e7eb;border-radius:20px;background:#ffffff;">
+              <h2 style="margin:0 0 16px 0;font-size:16px;color:#111111;">
+                Message
+              </h2>
+              <p style="margin:0;font-size:14px;line-height:1.8;color:#374151;">
+                ${message}
+              </p>
             </div>
 
-            <p style="margin:28px 0 0 0;font-size:12px;line-height:1.6;color:#737373;text-align:center;">
+            <p style="margin:28px 0 0 0;font-size:12px;line-height:1.6;color:#6b7280;text-align:center;">
               Qlyk Studio Auto — Notification automatique
             </p>
           </div>
@@ -185,8 +196,6 @@ Studio visuel automobile premium
                 Nous revenons vers vous rapidement avec la suite.
               </p>
             </div>
-
-            
 
             <div style="margin-top:28px;">
               <p style="margin:0 0 6px 0;font-size:15px;color:#ffffff;">À très bientôt,</p>

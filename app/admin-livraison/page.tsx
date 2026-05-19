@@ -26,12 +26,13 @@ export default function AdminLivraisonPage() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedVisual[]>([]);
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
 
   const cleanSlug = slug.trim();
 
   const { startUpload, isUploading } = useUploadThing("deliveryPhotos", {
     onUploadError: (error) => {
-      alert(`Erreur upload : ${error.message}`);
+      setStatusMessage(`Erreur UploadThing : ${error.message}`);
     },
   });
 
@@ -59,55 +60,74 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
 
     setSelectedFiles(Array.from(event.target.files));
     setSaved(false);
+    setStatusMessage("Photo sélectionnée. Cliquez maintenant sur “Lancer le transfert”.");
   }
 
   async function handleStartUpload() {
     if (!cleanSlug) {
-      alert("Veuillez renseigner un slug client.");
+      setStatusMessage("Erreur : veuillez renseigner un slug client.");
       return;
     }
 
     if (selectedFiles.length === 0) {
-      alert("Veuillez sélectionner au moins une photo.");
+      setStatusMessage("Erreur : veuillez sélectionner au moins une photo.");
       return;
     }
 
-    setSaved(false);
+    try {
+      setSaved(false);
+      setStatusMessage("Transfert UploadThing en cours...");
 
-    const uploaded = await startUpload(selectedFiles);
+      const uploaded = await startUpload(selectedFiles);
 
-    if (!uploaded || uploaded.length === 0) {
-      alert("Aucun fichier n’a été transféré.");
-      return;
+      if (!uploaded || uploaded.length === 0) {
+        setStatusMessage("Erreur : UploadThing n’a retourné aucun fichier.");
+        return;
+      }
+
+      setStatusMessage("Upload terminé. Sauvegarde Supabase en cours...");
+
+      const formattedFiles: UploadedVisual[] = uploaded.map((file) => ({
+        name: file.name,
+        url: file.url,
+        size: file.size,
+      }));
+
+      const response = await fetch("/api/qlyk/deliveries", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          slug: cleanSlug,
+          files: formattedFiles,
+        }),
+      });
+
+      let result: { error?: string; success?: boolean } = {};
+
+      try {
+        result = await response.json();
+      } catch {
+        result = {};
+      }
+
+      if (!response.ok) {
+        setStatusMessage(
+          `Erreur API : ${result.error || `HTTP ${response.status}`}`
+        );
+        return;
+      }
+
+      setUploadedFiles(formattedFiles);
+      setSelectedFiles([]);
+      setSaved(true);
+      setStatusMessage("Livraison enregistrée. Le lien client est prêt.");
+    } catch (error) {
+      setStatusMessage(
+        error instanceof Error ? `Erreur : ${error.message}` : "Erreur inconnue."
+      );
     }
-
-    const formattedFiles: UploadedVisual[] = uploaded.map((file) => ({
-      name: file.name,
-      url: file.url,
-      size: file.size,
-    }));
-
-    const response = await fetch("/api/qlyk/deliveries", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        slug: cleanSlug,
-        files: formattedFiles,
-      }),
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      alert(result.error || "Erreur sauvegarde livraison.");
-      return;
-    }
-
-    setUploadedFiles(formattedFiles);
-    setSelectedFiles([]);
-    setSaved(true);
   }
 
   async function copyText(text: string) {
@@ -228,10 +248,9 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
                 </div>
               </div>
 
-              {selectedFiles.length > 0 && !isUploading && (
-                <div className="mt-5 rounded-2xl border border-green-500/20 bg-green-500/10 px-4 py-3 text-sm text-green-200">
-                  Photo sélectionnée. Cliquez maintenant sur “Lancer le
-                  transfert”.
+              {statusMessage && (
+                <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/70">
+                  {statusMessage}
                 </div>
               )}
 

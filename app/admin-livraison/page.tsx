@@ -95,19 +95,16 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
         size: file.size,
       }));
 
-      const apiUrl = `${window.location.origin}/api/qlyk/deliveries`;
-
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          slug: cleanSlug,
-          files: formattedFiles,
-        }),
-      });
-
+      const response = await fetch("/api/qlyk/deliveries", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    slug: cleanSlug,
+    files: formattedFiles,
+  }),
+});
       let result: { error?: string; success?: boolean } = {};
 
       try {

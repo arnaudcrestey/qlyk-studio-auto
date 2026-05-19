@@ -11,6 +11,7 @@ import {
   UploadCloud,
 } from "lucide-react";
 import { useUploadThing } from "@/lib/uploadthing";
+import { supabase } from "@/lib/supabase";
 
 type UploadedVisual = {
   name: string;
@@ -25,28 +26,15 @@ export default function AdminLivraisonPage() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedVisual[]>([]);
   const [copied, setCopied] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  const cleanSlug = slug.trim();
 
   const { startUpload, isUploading } = useUploadThing("deliveryPhotos", {
-    onClientUploadComplete: (res) => {
-      if (!res) return;
-
-      setUploadedFiles((current) => [
-        ...current,
-        ...res.map((file) => ({
-          name: file.name,
-          url: file.url,
-          size: file.size,
-        })),
-      ]);
-
-      setSelectedFiles([]);
-    },
     onUploadError: (error) => {
       alert(`Erreur upload : ${error.message}`);
     },
   });
-
-  const cleanSlug = slug.trim();
 
   const deliveryUrl =
     cleanSlug.length > 0
@@ -69,12 +57,88 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
 
   function handleSelectFiles(event: React.ChangeEvent<HTMLInputElement>) {
     if (!event.target.files) return;
+
     setSelectedFiles(Array.from(event.target.files));
+    setSaved(false);
   }
 
   async function handleStartUpload() {
-    if (selectedFiles.length === 0) return;
-    await startUpload(selectedFiles);
+    if (!cleanSlug) {
+      alert("Veuillez renseigner un slug client.");
+      return;
+    }
+
+    if (selectedFiles.length === 0) {
+      alert("Veuillez sélectionner au moins une photo.");
+      return;
+    }
+
+    setSaved(false);
+
+    const uploaded = await startUpload(selectedFiles);
+
+    if (!uploaded || uploaded.length === 0) {
+      alert("Aucun fichier n’a été transféré.");
+      return;
+    }
+
+    const formattedFiles: UploadedVisual[] = uploaded.map((file) => ({
+      name: file.name,
+      url: file.url,
+      size: file.size,
+    }));
+
+    const { data: delivery, error: deliveryError } = await supabase
+      .from("qlyk_deliveries")
+      .upsert(
+        {
+          slug: cleanSlug,
+          client_name: cleanSlug,
+          vehicle: "À compléter",
+        },
+        {
+          onConflict: "slug",
+        }
+      )
+      .select("id")
+      .single();
+
+    if (deliveryError || !delivery) {
+      console.error(deliveryError);
+      alert("Erreur création livraison Supabase.");
+      return;
+    }
+
+    const { error: deleteError } = await supabase
+      .from("qlyk_delivery_photos")
+      .delete()
+      .eq("delivery_id", delivery.id);
+
+    if (deleteError) {
+      console.error(deleteError);
+      alert("Erreur nettoyage anciennes photos.");
+      return;
+    }
+
+    const photosToInsert = formattedFiles.map((file, index) => ({
+      delivery_id: delivery.id,
+      photo_url: file.url,
+      position: index,
+    }));
+
+    const { error: photosError } = await supabase
+      .from("qlyk_delivery_photos")
+      .insert(photosToInsert);
+
+    if (photosError) {
+      console.error(photosError);
+      alert("Erreur sauvegarde photos Supabase.");
+      return;
+    }
+
+    setUploadedFiles(formattedFiles);
+    setSelectedFiles([]);
+    setSaved(true);
   }
 
   async function copyText(text: string) {
@@ -195,10 +259,16 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
                 </div>
               </div>
 
-              {selectedFiles.length > 0 && (
+              {selectedFiles.length > 0 && !isUploading && (
                 <div className="mt-5 rounded-2xl border border-green-500/20 bg-green-500/10 px-4 py-3 text-sm text-green-200">
                   Photo sélectionnée. Cliquez maintenant sur “Lancer le
                   transfert”.
+                </div>
+              )}
+
+              {saved && (
+                <div className="mt-5 rounded-2xl border border-blue-500/20 bg-blue-500/10 px-4 py-3 text-sm text-blue-200">
+                  Livraison enregistrée dans Supabase. Le lien client est prêt.
                 </div>
               )}
             </div>
@@ -252,7 +322,7 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
             {codeToCopy && (
               <div className="rounded-2xl border border-white/10 bg-[#0b1220] p-5">
                 <h2 className="mb-3 font-medium text-white">
-                  Bloc à coller dans qlyk-deliveries.ts
+                  Bloc temporaire de secours
                 </h2>
 
                 <pre className="max-h-72 overflow-auto rounded-2xl bg-black/30 p-4 text-xs leading-6 text-white/70">
@@ -280,8 +350,8 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
                   </h2>
 
                   <p className="mt-2 text-sm leading-7 text-white/55">
-                    Une fois le bloc ajouté dans la mémoire des livraisons, ce
-                    lien affichera les visuels au client.
+                    Une fois le transfert terminé, ce lien affiche
+                    automatiquement les visuels enregistrés.
                   </p>
 
                   {deliveryUrl && (

@@ -11,7 +11,7 @@ import {
   UploadCloud,
 } from "lucide-react";
 import { useUploadThing } from "@/lib/uploadthing";
-import { supabase } from "@/lib/supabase";
+
 
 type UploadedVisual = {
   name: string;
@@ -88,63 +88,33 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
       size: file.size,
     }));
 
-    const { data: delivery, error: deliveryError } = await supabase
-      .from("qlyk_deliveries")
-      .upsert(
-        {
-          slug: cleanSlug,
-          client_name: cleanSlug,
-          vehicle: "À compléter",
-        },
-        {
-          onConflict: "slug",
-        }
-      )
-      .select("id")
-      .single();
+    const formattedFiles: UploadedVisual[] = uploaded.map((file) => ({
+  name: file.name,
+  url: file.url,
+  size: file.size,
+}));
 
-    if (deliveryError || !delivery) {
-  console.error("SUPABASE DELIVERY ERROR:", deliveryError);
+const response = await fetch("/api/qlyk/deliveries", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    slug: cleanSlug,
+    files: formattedFiles,
+  }),
+});
 
-  alert(
-    `Erreur création livraison Supabase : ${
-      deliveryError?.message || "erreur inconnue"
-    }`
-  );
+const result = await response.json();
 
+if (!response.ok) {
+  alert(result.error || "Erreur sauvegarde livraison.");
   return;
 }
 
-    const { error: deleteError } = await supabase
-      .from("qlyk_delivery_photos")
-      .delete()
-      .eq("delivery_id", delivery.id);
-
-    if (deleteError) {
-      console.error(deleteError);
-      alert("Erreur nettoyage anciennes photos.");
-      return;
-    }
-
-    const photosToInsert = formattedFiles.map((file, index) => ({
-      delivery_id: delivery.id,
-      photo_url: file.url,
-      position: index,
-    }));
-
-    const { error: photosError } = await supabase
-      .from("qlyk_delivery_photos")
-      .insert(photosToInsert);
-
-    if (photosError) {
-      console.error(photosError);
-      alert("Erreur sauvegarde photos Supabase.");
-      return;
-    }
-
-    setUploadedFiles(formattedFiles);
-    setSelectedFiles([]);
-    setSaved(true);
+setUploadedFiles(formattedFiles);
+setSelectedFiles([]);
+setSaved(true);
   }
 
   async function copyText(text: string) {

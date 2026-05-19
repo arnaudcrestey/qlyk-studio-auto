@@ -104,10 +104,16 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
       .single();
 
     if (deliveryError || !delivery) {
-      console.error(deliveryError);
-      alert("Erreur création livraison Supabase.");
-      return;
-    }
+  console.error("SUPABASE DELIVERY ERROR:", deliveryError);
+
+  alert(
+    `Erreur création livraison Supabase : ${
+      deliveryError?.message || "erreur inconnue"
+    }`
+  );
+
+  return;
+}
 
     const { error: deleteError } = await supabase
       .from("qlyk_delivery_photos")

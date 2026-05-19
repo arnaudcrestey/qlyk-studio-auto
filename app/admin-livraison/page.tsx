@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { useUploadThing } from "@/lib/uploadthing";
 
-
 type UploadedVisual = {
   name: string;
   url: string;
@@ -88,33 +87,27 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
       size: file.size,
     }));
 
-    const formattedFiles: UploadedVisual[] = uploaded.map((file) => ({
-  name: file.name,
-  url: file.url,
-  size: file.size,
-}));
+    const response = await fetch("/api/qlyk/deliveries", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        slug: cleanSlug,
+        files: formattedFiles,
+      }),
+    });
 
-const response = await fetch("/api/qlyk/deliveries", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    slug: cleanSlug,
-    files: formattedFiles,
-  }),
-});
+    const result = await response.json();
 
-const result = await response.json();
+    if (!response.ok) {
+      alert(result.error || "Erreur sauvegarde livraison.");
+      return;
+    }
 
-if (!response.ok) {
-  alert(result.error || "Erreur sauvegarde livraison.");
-  return;
-}
-
-setUploadedFiles(formattedFiles);
-setSelectedFiles([]);
-setSaved(true);
+    setUploadedFiles(formattedFiles);
+    setSelectedFiles([]);
+    setSaved(true);
   }
 
   async function copyText(text: string) {

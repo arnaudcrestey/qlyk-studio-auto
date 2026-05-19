@@ -179,35 +179,4 @@ export default async function LivraisonClientPage({ params }: PageProps) {
       </section>
     </main>
   );
-}                  href={photo}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rounded-full bg-white px-4 py-2 text-sm font-medium text-[#050816] transition hover:bg-white/90"
-                >
-                  Télécharger
-                </a>
-              </div>
-            </article>
-          ))}
-        </div>
-
-        <div className="mt-10 text-center">
-          <Link href="/livraison" className="text-sm text-white/50 hover:text-white">
-            Retour à l’espace livraison
-          </Link>
-        </div>
-      </section>
-    </main>
-  );
-}
-
-function InfoCard({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-      <p className="text-xs uppercase tracking-[0.25em] text-white/40">
-        {label}
-      </p>
-      <p className="mt-2 text-sm font-medium text-white">{value}</p>
-    </div>
-  );
 }

@@ -46,6 +46,7 @@ export async function POST(request: Request) {
 
     await sendMail({
       to: email,
+      bcc: "contact@qlykstudio.fr",
       subject: "QLYK Studio Auto — Vos visuels sont prêts",
       text: `
 Bonjour ${clientName},
@@ -108,7 +109,10 @@ Studio visuel automobile premium
       `,
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      message: "Email de livraison envoyé avec copie QLYK.",
+    });
   } catch (error) {
     console.error("QLYK SEND DELIVERY EMAIL ERROR:", error);
 

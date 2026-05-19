@@ -45,8 +45,7 @@ export async function POST(request: Request) {
     }
 
     await sendMail({
-      to: email,
-      bcc: "contact@qlykstudio.fr",
+  to: `${email}, contact@qlykstudio.fr`,
       subject: "QLYK Studio Auto — Vos visuels sont prêts",
       text: `
 Bonjour ${clientName},

@@ -11,17 +11,9 @@ type PageProps = {
 
 type DeliveryPhoto = {
   id: string;
+  delivery_id: string;
   photo_url: string;
   position: number | null;
-};
-
-type Delivery = {
-  id: string;
-  slug: string;
-  client_name: string | null;
-  vehicle: string | null;
-  created_at: string | null;
-  qlyk_delivery_photos: DeliveryPhoto[];
 };
 
 export default async function LivraisonClientPage({ params }: PageProps) {
@@ -29,30 +21,21 @@ export default async function LivraisonClientPage({ params }: PageProps) {
 
   const { data: delivery, error } = await supabase
     .from("qlyk_deliveries")
-    .select(
-      `
-      id,
-      slug,
-      client_name,
-      vehicle,
-      created_at,
-      qlyk_delivery_photos (
-        id,
-        photo_url,
-        position
-      )
-    `
-    )
+    .select("*")
     .eq("slug", slug)
-    .single<Delivery>();
+    .single();
 
   if (error || !delivery) {
     notFound();
   }
 
-  const photos = [...(delivery.qlyk_delivery_photos ?? [])].sort(
-    (a, b) => (a.position ?? 0) - (b.position ?? 0)
-  );
+  const { data: photosData } = await supabase
+    .from("qlyk_delivery_photos")
+    .select("*")
+    .eq("delivery_id", delivery.id)
+    .order("position", { ascending: true });
+
+  const photos: DeliveryPhoto[] = photosData ?? [];
 
   return (
     <main className="min-h-screen bg-[#050816] text-white">

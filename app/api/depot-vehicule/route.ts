@@ -8,12 +8,17 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 type UploadedFile = {
   name?: string;
-  url: string;
+  url?: string;
+  ufsUrl?: string;
   size?: number;
 };
 
 function clean(value?: string) {
   return value && value.trim() !== "" ? value : "Non renseigné";
+}
+
+function getFileUrl(file: UploadedFile) {
+  return file.ufsUrl || file.url || "";
 }
 
 export async function POST(request: Request) {
@@ -37,7 +42,7 @@ export async function POST(request: Request) {
     const body = await request.json();
 
     const uploadedFiles: UploadedFile[] = Array.isArray(body.uploadedFiles)
-      ? body.uploadedFiles
+      ? body.uploadedFiles.filter((file: UploadedFile) => getFileUrl(file))
       : [];
 
     if (uploadedFiles.length === 0) {
@@ -89,7 +94,7 @@ export async function POST(request: Request) {
 
     const photosPayload = uploadedFiles.map((file, index) => ({
       deposit_id: deposit.id,
-      photo_url: file.url,
+      photo_url: getFileUrl(file),
       file_name: file.name || "",
       file_size: file.size || 0,
       position: index,
@@ -118,14 +123,17 @@ export async function POST(request: Request) {
     }
 
     const photosText = uploadedFiles
-      .map((file, index) => `${index + 1}. ${file.name || "Photo"} — ${file.url}`)
+      .map(
+        (file, index) =>
+          `${index + 1}. ${file.name || "Photo"} — ${getFileUrl(file)}`
+      )
       .join("\n");
 
     const photosHtml = uploadedFiles
       .map(
         (file, index) =>
           `<li style="margin:0 0 8px 0;color:#374151;">
-            <a href="${file.url}" target="_blank" rel="noreferrer" style="color:#2563eb;text-decoration:underline;">
+            <a href="${getFileUrl(file)}" target="_blank" rel="noreferrer" style="color:#2563eb;text-decoration:underline;">
               Photo ${index + 1} — ${file.name || "Photo véhicule"}
             </a>
           </li>`
@@ -161,12 +169,8 @@ ${clean(body.message)}
         <div style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,Helvetica,sans-serif;color:#111111;">
           <div style="max-width:620px;margin:0 auto;padding:30px 20px;">
             <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:16px;padding:24px;margin-bottom:18px;">
-              <p style="font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#2563eb;margin:0 0 8px 0;">
-                Qlyk Studio Auto
-              </p>
-              <h2 style="margin:0;font-size:24px;line-height:1.3;color:#111111;">
-                Nouveau dépôt véhicule
-              </h2>
+              <p style="font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#2563eb;margin:0 0 8px 0;">Qlyk Studio Auto</p>
+              <h2 style="margin:0;font-size:24px;line-height:1.3;color:#111111;">Nouveau dépôt véhicule</h2>
               <p style="margin:12px 0 0 0;font-size:14px;line-height:1.7;color:#4b5563;">
                 Une nouvelle commande véhicule vient d’être transmise depuis le site.
               </p>
@@ -191,21 +195,13 @@ ${clean(body.message)}
 
             <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:16px;padding:20px;margin-bottom:18px;">
               <p style="margin:0 0 12px 0;color:#111111;"><strong>Photos transmises :</strong></p>
-              <ul style="margin:0;padding-left:20px;color:#374151;">
-                ${photosHtml}
-              </ul>
+              <ul style="margin:0;padding-left:20px;color:#374151;">${photosHtml}</ul>
             </div>
 
             <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:16px;padding:20px;">
               <p style="margin:0 0 12px 0;color:#111111;"><strong>Message :</strong></p>
-              <p style="margin:0;font-size:14px;line-height:1.8;color:#374151;">
-                ${clean(body.message)}
-              </p>
+              <p style="margin:0;font-size:14px;line-height:1.8;color:#374151;">${clean(body.message)}</p>
             </div>
-
-            <p style="margin:28px 0 0 0;font-size:12px;line-height:1.6;color:#6b7280;text-align:center;">
-              Qlyk Studio Auto — Notification automatique
-            </p>
           </div>
         </div>
       `,
@@ -230,24 +226,14 @@ Studio visuel automobile premium
         html: `
           <div style="font-family:Arial,sans-serif;background:#050505;color:#ffffff;padding:30px;">
             <div style="max-width:620px;margin:auto;">
-              <p style="font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#3b82f6;margin:0 0 8px;">
-                Qlyk Studio Auto
-              </p>
-
-              <h1 style="margin:0 0 12px;font-size:26px;">
-                Votre dépôt véhicule a bien été reçu
-              </h1>
-
-              <p style="color:#999;margin-bottom:28px;">
-                ${uploadedFiles.length} photo(s) transmise(s)
-              </p>
-
+              <p style="font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#3b82f6;margin:0 0 8px;">Qlyk Studio Auto</p>
+              <h1 style="margin:0 0 12px;font-size:26px;">Votre dépôt véhicule a bien été reçu</h1>
+              <p style="color:#999;margin-bottom:28px;">${uploadedFiles.length} photo(s) transmise(s)</p>
               <div style="background:#111;padding:24px;border-radius:14px;">
                 <p>Bonjour ${clean(body.firstName)},</p>
                 <p>Votre dépôt véhicule a bien été reçu.</p>
                 <p>Nous vérifions les visuels transmis et revenons vers vous avec la suite du traitement.</p>
               </div>
-
               <p style="margin-top:28px;">
                 À très bientôt,<br />
                 <strong>Qlyk Studio Auto</strong><br />

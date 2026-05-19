@@ -3,30 +3,41 @@ import { createClient } from "@supabase/supabase-js";
 
 export const runtime = "nodejs";
 
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !supabaseServiceKey) {
+  console.error("SUPABASE ENV MISSING", {
+    hasUrl: !!supabaseUrl,
+    hasServiceKey: !!supabaseServiceKey,
+  });
+}
+
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  supabaseUrl || "",
+  supabaseServiceKey || ""
 );
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-
-    const slug = body.slug?.trim();
-    const files = body.files ?? [];
-
-    if (!slug) {
+    if (!supabaseUrl || !supabaseServiceKey) {
       return NextResponse.json(
-        { error: "Slug manquant." },
-        { status: 400 }
+        { error: "Configuration Supabase manquante dans Vercel." },
+        { status: 500 }
       );
     }
 
-    if (!Array.isArray(files) || files.length === 0) {
-      return NextResponse.json(
-        { error: "Aucune photo." },
-        { status: 400 }
-      );
+    const body = await request.json();
+
+    const slug = String(body.slug || "").trim();
+    const files = Array.isArray(body.files) ? body.files : [];
+
+    if (!slug) {
+      return NextResponse.json({ error: "Slug manquant." }, { status: 400 });
+    }
+
+    if (files.length === 0) {
+      return NextResponse.json({ error: "Aucune photo." }, { status: 400 });
     }
 
     const { data: delivery, error: deliveryError } = await supabase
@@ -37,36 +48,34 @@ export async function POST(request: Request) {
           client_name: slug,
           vehicle: "À compléter",
         },
-        {
-          onConflict: "slug",
-        }
+        { onConflict: "slug" }
       )
       .select("id")
       .single();
 
     if (deliveryError || !delivery) {
       console.error("DELIVERY ERROR:", deliveryError);
-
       return NextResponse.json(
-        {
-          error: deliveryError?.message || "Erreur livraison.",
-        },
+        { error: deliveryError?.message || "Erreur livraison." },
         { status: 500 }
       );
     }
 
-    await supabase
+    const { error: deleteError } = await supabase
       .from("qlyk_delivery_photos")
       .delete()
       .eq("delivery_id", delivery.id);
 
-    const photos = files.map(
-      (file: { url: string }, index: number) => ({
-        delivery_id: delivery.id,
-        photo_url: file.url,
-        position: index,
-      })
-    );
+    if (deleteError) {
+      console.error("DELETE PHOTOS ERROR:", deleteError);
+      return NextResponse.json({ error: deleteError.message }, { status: 500 });
+    }
+
+    const photos = files.map((file: { url: string }, index: number) => ({
+      delivery_id: delivery.id,
+      photo_url: file.url,
+      position: index,
+    }));
 
     const { error: photosError } = await supabase
       .from("qlyk_delivery_photos")
@@ -74,25 +83,15 @@ export async function POST(request: Request) {
 
     if (photosError) {
       console.error("PHOTOS ERROR:", photosError);
-
-      return NextResponse.json(
-        {
-          error: photosError.message,
-        },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: photosError.message }, { status: 500 });
     }
 
-    return NextResponse.json({
-      success: true,
-    });
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("QYLK DELIVERY API ERROR:", error);
+    console.error("QLYK DELIVERY API ERROR:", error);
 
     return NextResponse.json(
-      {
-        error: "Erreur serveur.",
-      },
+      { error: error instanceof Error ? error.message : "Erreur serveur." },
       { status: 500 }
     );
   }

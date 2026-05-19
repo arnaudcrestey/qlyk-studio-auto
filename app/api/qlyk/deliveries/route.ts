@@ -1,34 +1,20 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 
 export const runtime = "nodejs";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-if (!supabaseUrl || !supabaseServiceKey) {
-  console.error("SUPABASE ENV MISSING", {
-    hasUrl: !!supabaseUrl,
-    hasServiceKey: !!supabaseServiceKey,
-  });
-}
-
-const supabase = createClient(
-  supabaseUrl || "",
-  supabaseServiceKey || ""
-);
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 export async function POST(request: Request) {
   try {
-    if (!supabaseUrl || !supabaseServiceKey) {
+    if (!supabaseUrl || !supabaseKey) {
       return NextResponse.json(
-        { error: "Configuration Supabase manquante dans Vercel." },
+        { error: "Variables Supabase manquantes." },
         { status: 500 }
       );
     }
 
     const body = await request.json();
-
     const slug = String(body.slug || "").trim();
     const files = Array.isArray(body.files) ? body.files : [];
 
@@ -40,35 +26,52 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Aucune photo." }, { status: 400 });
     }
 
-    const { data: delivery, error: deliveryError } = await supabase
-      .from("qlyk_deliveries")
-      .upsert(
-        {
+    const deliveryResponse = await fetch(
+      `${supabaseUrl}/rest/v1/qlyk_deliveries?on_conflict=slug`,
+      {
+        method: "POST",
+        headers: {
+          apikey: supabaseKey,
+          Authorization: `Bearer ${supabaseKey}`,
+          "Content-Type": "application/json",
+          Prefer: "resolution=merge-duplicates,return=representation",
+        },
+        body: JSON.stringify({
           slug,
           client_name: slug,
           vehicle: "À compléter",
-        },
-        { onConflict: "slug" }
-      )
-      .select("id")
-      .single();
+        }),
+      }
+    );
 
-    if (deliveryError || !delivery) {
-      console.error("DELIVERY ERROR:", deliveryError);
+    const deliveryText = await deliveryResponse.text();
+
+    if (!deliveryResponse.ok) {
       return NextResponse.json(
-        { error: deliveryError?.message || "Erreur livraison." },
+        { error: `Erreur livraison Supabase : ${deliveryText}` },
         { status: 500 }
       );
     }
 
-    const { error: deleteError } = await supabase
-      .from("qlyk_delivery_photos")
-      .delete()
-      .eq("delivery_id", delivery.id);
+    const delivery = JSON.parse(deliveryText)[0];
 
-    if (deleteError) {
-      console.error("DELETE PHOTOS ERROR:", deleteError);
-      return NextResponse.json({ error: deleteError.message }, { status: 500 });
+    const deleteResponse = await fetch(
+      `${supabaseUrl}/rest/v1/qlyk_delivery_photos?delivery_id=eq.${delivery.id}`,
+      {
+        method: "DELETE",
+        headers: {
+          apikey: supabaseKey,
+          Authorization: `Bearer ${supabaseKey}`,
+        },
+      }
+    );
+
+    if (!deleteResponse.ok) {
+      const deleteText = await deleteResponse.text();
+      return NextResponse.json(
+        { error: `Erreur suppression photos : ${deleteText}` },
+        { status: 500 }
+      );
     }
 
     const photos = files.map((file: { url: string }, index: number) => ({
@@ -77,21 +80,36 @@ export async function POST(request: Request) {
       position: index,
     }));
 
-    const { error: photosError } = await supabase
-      .from("qlyk_delivery_photos")
-      .insert(photos);
+    const photosResponse = await fetch(
+      `${supabaseUrl}/rest/v1/qlyk_delivery_photos`,
+      {
+        method: "POST",
+        headers: {
+          apikey: supabaseKey,
+          Authorization: `Bearer ${supabaseKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(photos),
+      }
+    );
 
-    if (photosError) {
-      console.error("PHOTOS ERROR:", photosError);
-      return NextResponse.json({ error: photosError.message }, { status: 500 });
+    if (!photosResponse.ok) {
+      const photosText = await photosResponse.text();
+      return NextResponse.json(
+        { error: `Erreur photos Supabase : ${photosText}` },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("QLYK DELIVERY API ERROR:", error);
-
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Erreur serveur." },
+      {
+        error:
+          error instanceof Error
+            ? `Erreur serveur : ${error.message}`
+            : "Erreur serveur inconnue.",
+      },
       { status: 500 }
     );
   }

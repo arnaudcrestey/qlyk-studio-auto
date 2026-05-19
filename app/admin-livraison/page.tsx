@@ -60,7 +60,9 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
 
     setSelectedFiles(Array.from(event.target.files));
     setSaved(false);
-    setStatusMessage("Photo sélectionnée. Cliquez maintenant sur “Lancer le transfert”.");
+    setStatusMessage(
+      "Photo sélectionnée. Cliquez maintenant sur “Lancer le transfert”."
+    );
   }
 
   async function handleStartUpload() {
@@ -85,7 +87,7 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
         return;
       }
 
-      setStatusMessage("Upload terminé. Sauvegarde Supabase en cours...");
+      setStatusMessage("Upload terminé. Sauvegarde de la livraison en cours...");
 
       const formattedFiles: UploadedVisual[] = uploaded.map((file) => ({
         name: file.name,
@@ -93,7 +95,9 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
         size: file.size,
       }));
 
-      const response = await fetch("/api/qlyk/deliveries", {
+      const apiUrl = `${window.location.origin}/api/qlyk/deliveries`;
+
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -439,7 +439,28 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
                 </div>
               )}
 
-              {deliveryReady && (
+            {codeToCopy && (
+              <div className="rounded-2xl border border-white/10 bg-[#0b1220] p-5">
+                <h2 className="mb-3 font-medium text-white">
+                  Bloc temporaire de secours
+                </h2>
+
+                <pre className="max-h-72 overflow-auto rounded-2xl bg-black/30 p-4 text-xs leading-6 text-white/70">
+                  {codeToCopy}
+                </pre>
+
+                <button
+                  type="button"
+                  onClick={() => copyText(codeToCopy)}
+                  className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-medium text-[#050816] transition hover:bg-white/90"
+                >
+                  <Copy className="h-4 w-4" />
+                  Copier le bloc
+                </button>
+              </div>
+            )}
+
+            {deliveryReady && (
                 <div className="mt-5 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-5">
                   <div className="flex items-center gap-3 text-emerald-200">
                     <CheckCircle2 className="h-5 w-5" />
@@ -505,28 +526,6 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
                 </div>
               </div>
             )}
-
-            {codeToCopy && (
-              <div className="rounded-2xl border border-white/10 bg-[#0b1220] p-5">
-                <h2 className="mb-3 font-medium text-white">
-                  Bloc temporaire de secours
-                </h2>
-
-                <pre className="max-h-72 overflow-auto rounded-2xl bg-black/30 p-4 text-xs leading-6 text-white/70">
-                  {codeToCopy}
-                </pre>
-
-                <button
-                  type="button"
-                  onClick={() => copyText(codeToCopy)}
-                  className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-medium text-[#050816] transition hover:bg-white/90"
-                >
-                  <Copy className="h-4 w-4" />
-                  Copier le bloc
-                </button>
-              </div>
-            )}
-
             <div className="rounded-2xl border border-blue-500/10 bg-blue-500/5 p-5">
               <div className="flex gap-4">
                 <ShieldCheck className="mt-1 h-5 w-5 text-blue-300" />

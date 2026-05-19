@@ -5,6 +5,17 @@ export const runtime = "nodejs";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+type DeliveryFile = {
+  url?: string;
+  ufsUrl?: string;
+  name?: string;
+  size?: number;
+};
+
+function getFileUrl(file: DeliveryFile) {
+  return file.ufsUrl || file.url || "";
+}
+
 export async function POST(request: Request) {
   try {
     if (!supabaseUrl || !supabaseKey) {
@@ -15,11 +26,22 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
+
     const slug = String(body.slug || "").trim();
-    const files = Array.isArray(body.files) ? body.files : [];
+    const deliveryLabel = String(body.deliveryLabel || "").trim();
+    const files: DeliveryFile[] = Array.isArray(body.files)
+      ? body.files.filter((file: DeliveryFile) => getFileUrl(file))
+      : [];
 
     if (!slug) {
       return NextResponse.json({ error: "Slug manquant." }, { status: 400 });
+    }
+
+    if (!deliveryLabel) {
+      return NextResponse.json(
+        { error: "Dossier / lot livré manquant." },
+        { status: 400 }
+      );
     }
 
     if (files.length === 0) {
@@ -39,7 +61,8 @@ export async function POST(request: Request) {
         body: JSON.stringify({
           slug,
           client_name: slug,
-          vehicle: "À compléter",
+          vehicle: "",
+          delivery_label: deliveryLabel,
         }),
       }
     );
@@ -55,6 +78,13 @@ export async function POST(request: Request) {
 
     const delivery = JSON.parse(deliveryText)[0];
 
+    if (!delivery?.id) {
+      return NextResponse.json(
+        { error: "Livraison Supabase introuvable après création." },
+        { status: 500 }
+      );
+    }
+
     const deleteResponse = await fetch(
       `${supabaseUrl}/rest/v1/qlyk_delivery_photos?delivery_id=eq.${delivery.id}`,
       {
@@ -68,15 +98,18 @@ export async function POST(request: Request) {
 
     if (!deleteResponse.ok) {
       const deleteText = await deleteResponse.text();
+
       return NextResponse.json(
         { error: `Erreur suppression photos : ${deleteText}` },
         { status: 500 }
       );
     }
 
-    const photos = files.map((file: { url: string }, index: number) => ({
+    const photos = files.map((file, index) => ({
       delivery_id: delivery.id,
-      photo_url: file.url,
+      photo_url: getFileUrl(file),
+      file_name: file.name || "",
+      file_size: file.size || 0,
       position: index,
     }));
 
@@ -95,14 +128,22 @@ export async function POST(request: Request) {
 
     if (!photosResponse.ok) {
       const photosText = await photosResponse.text();
+
       return NextResponse.json(
         { error: `Erreur photos Supabase : ${photosText}` },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      slug,
+      deliveryLabel,
+      photoCount: files.length,
+    });
   } catch (error) {
+    console.error("QLYK DELIVERY ERROR:", error);
+
     return NextResponse.json(
       {
         error:

@@ -22,6 +22,7 @@ export default function AdminLivraisonPage() {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const [slug, setSlug] = useState("");
+  const [deliveryLabel, setDeliveryLabel] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedVisual[]>([]);
   const [copied, setCopied] = useState(false);
@@ -29,6 +30,7 @@ export default function AdminLivraisonPage() {
   const [statusMessage, setStatusMessage] = useState("");
 
   const cleanSlug = slug.trim();
+  const cleanDeliveryLabel = deliveryLabel.trim();
 
   const { startUpload, isUploading } = useUploadThing("deliveryPhotos", {
     onUploadError: (error) => {
@@ -47,13 +49,13 @@ export default function AdminLivraisonPage() {
     return `{
   slug: "${cleanSlug}",
   clientName: "Nom du client",
-  vehicle: "Véhicule concerné",
-  deliveredAt: "18 mai 2026",
+  deliveryLabel: "${cleanDeliveryLabel || "Livraison QLYK"}",
+  deliveredAt: "19 mai 2026",
   photos: [
 ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
   ],
 },`;
-  }, [cleanSlug, uploadedFiles]);
+  }, [cleanSlug, cleanDeliveryLabel, uploadedFiles]);
 
   function handleSelectFiles(event: React.ChangeEvent<HTMLInputElement>) {
     if (!event.target.files) return;
@@ -68,6 +70,11 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
   async function handleStartUpload() {
     if (!cleanSlug) {
       setStatusMessage("Erreur : veuillez renseigner un slug client.");
+      return;
+    }
+
+    if (!cleanDeliveryLabel) {
+      setStatusMessage("Erreur : veuillez renseigner le dossier / lot livré.");
       return;
     }
 
@@ -96,15 +103,17 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
       }));
 
       const response = await fetch("/api/qlyk/deliveries", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    slug: cleanSlug,
-    files: formattedFiles,
-  }),
-});
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          slug: cleanSlug,
+          deliveryLabel: cleanDeliveryLabel,
+          files: formattedFiles,
+        }),
+      });
+
       let result: { error?: string; success?: boolean } = {};
 
       try {
@@ -166,7 +175,7 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
 
               <input
                 type="text"
-                placeholder="bmw-x5-garage-martin"
+                placeholder="garage-martin-mai-2026"
                 value={slug}
                 onChange={(event) =>
                   setSlug(
@@ -181,7 +190,25 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
               />
 
               <p className="mt-3 text-sm text-white/40">
-                Exemple : bmw-x5-garage-martin
+                Exemple : garage-martin-mai-2026
+              </p>
+            </div>
+
+            <div>
+              <label className="mb-3 block text-sm font-medium text-white/80">
+                Dossier / lot livré
+              </label>
+
+              <input
+                type="text"
+                placeholder="Lot véhicules — Mai 2026"
+                value={deliveryLabel}
+                onChange={(event) => setDeliveryLabel(event.target.value)}
+                className="w-full rounded-2xl border border-white/10 bg-[#0b1220] px-5 py-4 text-white outline-none transition placeholder:text-white/30 focus:border-blue-500"
+              />
+
+              <p className="mt-3 text-sm text-white/40">
+                Exemple : Lot véhicules — Mai 2026, BMW X5, Série SUV Garage Martin
               </p>
             </div>
 
@@ -234,7 +261,12 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
                   <button
                     type="button"
                     onClick={handleStartUpload}
-                    disabled={selectedFiles.length === 0 || isUploading}
+                    disabled={
+                      selectedFiles.length === 0 ||
+                      isUploading ||
+                      !cleanSlug ||
+                      !cleanDeliveryLabel
+                    }
                     className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#16a34a] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#22c55e] disabled:cursor-not-allowed disabled:bg-[#16a34a]/40 disabled:opacity-50"
                   >
                     {isUploading ? (

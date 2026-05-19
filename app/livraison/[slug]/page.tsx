@@ -61,7 +61,7 @@ export default async function LivraisonClientPage({ params }: PageProps) {
             </h1>
 
             <p className="mt-5 max-w-2xl text-white/65">
-              Retrouvez ci-dessous les visuels finalisés pour votre véhicule.
+              Retrouvez ci-dessous les visuels finalisés pour votre dossier.
               Vous pouvez les consulter et les télécharger directement.
             </p>
 
@@ -77,10 +77,10 @@ export default async function LivraisonClientPage({ params }: PageProps) {
 
               <div className="rounded-2xl border border-white/10 bg-[#0b1220] p-4">
                 <p className="text-xs uppercase tracking-[0.25em] text-white/40">
-                  Véhicule
+                  Dossier
                 </p>
                 <p className="mt-2 text-sm font-medium text-white">
-                  {delivery.vehicle || "Véhicule livré"}
+                  {delivery.delivery_label || "Livraison QLYK"}
                 </p>
               </div>
 

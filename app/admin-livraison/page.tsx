@@ -91,7 +91,7 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
 
       const formattedFiles: UploadedVisual[] = uploaded.map((file) => ({
         name: file.name,
-        url: file.url,
+        url: file.ufsUrl,
         size: file.size,
       }));
 

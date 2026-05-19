@@ -28,8 +28,11 @@ export default function AdminLivraisonPage() {
   const [clientEmail, setClientEmail] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedVisual[]>([]);
+
   const [copied, setCopied] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
 
@@ -49,6 +52,15 @@ export default function AdminLivraisonPage() {
       ? `https://www.qlykstudio.fr/livraison/${cleanSlug}`
       : "";
 
+  const deliveryReady = saved && uploadedFiles.length > 0 && Boolean(deliveryUrl);
+
+  const canSendEmail =
+    deliveryReady &&
+    Boolean(cleanClientName) &&
+    Boolean(cleanClientEmail) &&
+    Boolean(cleanDeliveryLabel) &&
+    !sendingEmail;
+
   const codeToCopy = useMemo(() => {
     if (!cleanSlug || uploadedFiles.length === 0) return "";
 
@@ -63,11 +75,22 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
 },`;
   }, [cleanSlug, cleanClientName, cleanDeliveryLabel, uploadedFiles]);
 
+  function resetDeliveryState() {
+    setSaved(false);
+    setCopied(false);
+    setLinkCopied(false);
+    setEmailSent(false);
+    setUploadedFiles([]);
+  }
+
   function handleSelectFiles(event: React.ChangeEvent<HTMLInputElement>) {
     if (!event.target.files) return;
 
     setSelectedFiles(Array.from(event.target.files));
     setSaved(false);
+    setCopied(false);
+    setLinkCopied(false);
+    setEmailSent(false);
     setStatusMessage(
       "Photo sélectionnée. Cliquez maintenant sur “Lancer le transfert”."
     );
@@ -91,6 +114,9 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
 
     try {
       setSaved(false);
+      setCopied(false);
+      setLinkCopied(false);
+      setEmailSent(false);
       setStatusMessage("Transfert UploadThing en cours...");
 
       const uploaded = await startUpload(selectedFiles);
@@ -138,7 +164,9 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
       setUploadedFiles(formattedFiles);
       setSelectedFiles([]);
       setSaved(true);
-      setStatusMessage("Livraison enregistrée. Le lien client est prêt.");
+      setStatusMessage(
+        "Livraison enregistrée. Le lien est prêt à être copié ou envoyé."
+      );
     } catch (error) {
       setStatusMessage(
         error instanceof Error ? `Erreur : ${error.message}` : "Erreur inconnue."
@@ -167,7 +195,7 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
       return;
     }
 
-    if (!saved || uploadedFiles.length === 0) {
+    if (!deliveryReady) {
       setStatusMessage(
         "Erreur : veuillez d’abord enregistrer la livraison avant d’envoyer le mail."
       );
@@ -176,7 +204,7 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
 
     try {
       setSendingEmail(true);
-      setStatusMessage("Envoi du mail client en cours...");
+      setStatusMessage("Envoi du mail de livraison en cours...");
 
       const response = await fetch("/api/qlyk/send-delivery-email", {
         method: "POST",
@@ -206,8 +234,10 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
         return;
       }
 
+      setEmailSent(true);
       setStatusMessage(
-        result.message || "Email client envoyé avec succès avec copie QLYK."
+        result.message ||
+          "Mail de livraison envoyé au client. Copie interne QLYK envoyée."
       );
     } catch (error) {
       setStatusMessage(
@@ -225,6 +255,8 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
 
     await navigator.clipboard.writeText(text);
     setCopied(true);
+    setLinkCopied(true);
+    setStatusMessage("Lien de livraison copié avec succès.");
     setTimeout(() => setCopied(false), 1800);
   }
 
@@ -241,8 +273,8 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
           </h1>
 
           <p className="mt-5 max-w-2xl text-white/65">
-            Choisissez les visuels finaux, lancez le transfert, puis envoyez le
-            lien privé au client.
+            Préparez les visuels finaux, générez le lien privé, puis envoyez le
+            mail premium au client.
           </p>
         </div>
 
@@ -257,15 +289,16 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
                 type="text"
                 placeholder="garage-martin-mai-2026"
                 value={slug}
-                onChange={(event) =>
+                onChange={(event) => {
+                  resetDeliveryState();
                   setSlug(
                     event.target.value
                       .toLowerCase()
                       .trim()
                       .replace(/\s+/g, "-")
                       .replace(/[^a-z0-9-]/g, "")
-                  )
-                }
+                  );
+                }}
                 className="w-full rounded-2xl border border-white/10 bg-[#0b1220] px-5 py-4 text-white outline-none transition placeholder:text-white/30 focus:border-blue-500"
               />
 
@@ -283,13 +316,15 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
                 type="text"
                 placeholder="Lot véhicules — Mai 2026"
                 value={deliveryLabel}
-                onChange={(event) => setDeliveryLabel(event.target.value)}
+                onChange={(event) => {
+                  setEmailSent(false);
+                  setDeliveryLabel(event.target.value);
+                }}
                 className="w-full rounded-2xl border border-white/10 bg-[#0b1220] px-5 py-4 text-white outline-none transition placeholder:text-white/30 focus:border-blue-500"
               />
 
               <p className="mt-3 text-sm text-white/40">
-                Exemple : Lot véhicules — Mai 2026, BMW X5, Série SUV Garage
-                Martin
+                Exemple : Lot véhicules — Mai 2026, BMW X5, Série SUV Garage Martin
               </p>
             </div>
 
@@ -303,7 +338,10 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
                   type="text"
                   placeholder="Garage Martin"
                   value={clientName}
-                  onChange={(event) => setClientName(event.target.value)}
+                  onChange={(event) => {
+                    setEmailSent(false);
+                    setClientName(event.target.value);
+                  }}
                   className="w-full rounded-2xl border border-white/10 bg-[#0b1220] px-5 py-4 text-white outline-none transition placeholder:text-white/30 focus:border-blue-500"
                 />
               </div>
@@ -317,7 +355,10 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
                   type="email"
                   placeholder="contact@garage.fr"
                   value={clientEmail}
-                  onChange={(event) => setClientEmail(event.target.value)}
+                  onChange={(event) => {
+                    setEmailSent(false);
+                    setClientEmail(event.target.value);
+                  }}
                   className="w-full rounded-2xl border border-white/10 bg-[#0b1220] px-5 py-4 text-white outline-none transition placeholder:text-white/30 focus:border-blue-500"
                 />
               </div>
@@ -398,9 +439,23 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
                 </div>
               )}
 
-              {saved && (
-                <div className="mt-5 rounded-2xl border border-blue-500/20 bg-blue-500/10 px-4 py-3 text-sm text-blue-200">
-                  Livraison enregistrée dans Supabase. Le lien client est prêt.
+              {deliveryReady && (
+                <div className="mt-5 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-5">
+                  <div className="flex items-center gap-3 text-emerald-200">
+                    <CheckCircle2 className="h-5 w-5" />
+                    <h2 className="font-medium">Livraison prête</h2>
+                  </div>
+
+                  <div className="mt-4 space-y-3 text-sm text-white/75">
+                    <p>✅ Livraison enregistrée dans Supabase</p>
+                    <p>
+                      {linkCopied ? "✅" : "⏳"} Lien de livraison copié
+                    </p>
+                    <p>
+                      {emailSent ? "✅" : "⏳"} Mail client envoyé + copie interne
+                      QLYK
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
@@ -498,7 +553,7 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
             <div className="flex flex-col gap-3 sm:flex-row">
               <button
                 type="button"
-                disabled={!deliveryUrl || uploadedFiles.length === 0}
+                disabled={!deliveryReady}
                 onClick={() => copyText(deliveryUrl)}
                 className="inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-600 px-6 py-4 text-sm font-medium text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-blue-600/40 disabled:opacity-50"
               >
@@ -508,32 +563,31 @@ ${uploadedFiles.map((file) => `    "${file.url}",`).join("\n")}
                   <Copy className="h-4 w-4" />
                 )}
 
-                {copied ? "Copié" : "Copier le lien de livraison"}
+                {copied ? "Lien copié" : "Copier le lien client"}
 
                 <ArrowRight className="h-4 w-4" />
               </button>
 
               <button
                 type="button"
-                disabled={
-                  !deliveryUrl ||
-                  uploadedFiles.length === 0 ||
-                  !cleanClientName ||
-                  !cleanClientEmail ||
-                  sendingEmail
-                }
+                disabled={!canSendEmail}
                 onClick={sendDeliveryEmail}
                 className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/10 px-6 py-4 text-sm font-medium text-white transition hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {sendingEmail ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Envoi...
+                    Envoi en cours...
+                  </>
+                ) : emailSent ? (
+                  <>
+                    <CheckCircle2 className="h-4 w-4" />
+                    Mail de livraison envoyé
                   </>
                 ) : (
                   <>
                     <Mail className="h-4 w-4" />
-                    Envoyer le mail client
+                    Envoyer le mail de livraison
                   </>
                 )}
               </button>

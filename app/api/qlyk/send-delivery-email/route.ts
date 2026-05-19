@@ -3,6 +3,8 @@ import { sendMail } from "@/lib/mail";
 
 export const runtime = "nodejs";
 
+const INTERNAL_QQLYK_EMAIL = "contact@qlykstudio.fr";
+
 function clean(value?: string) {
   return value && value.trim() !== "" ? value.trim() : "";
 }
@@ -45,7 +47,7 @@ export async function POST(request: Request) {
     }
 
     await sendMail({
-  to: `${email}, contact@qlykstudio.fr`,
+      to: email,
       subject: "QLYK Studio Auto — Vos visuels sont prêts",
       text: `
 Bonjour ${clientName},
@@ -108,9 +110,79 @@ Studio visuel automobile premium
       `,
     });
 
+    await sendMail({
+      to: INTERNAL_QQLYK_EMAIL,
+      subject: `QLYK — Copie livraison envoyée — ${clientName}`,
+      text: `
+Copie interne QLYK
+
+Une livraison client vient d’être envoyée.
+
+Client :
+${clientName}
+
+Email client :
+${email}
+
+Dossier :
+${deliveryLabel}
+
+Lien de livraison :
+${deliveryUrl}
+`,
+      html: `
+        <div style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+          <div style="max-width:640px;margin:0 auto;padding:30px 20px;">
+            <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:18px;padding:26px;margin-bottom:18px;">
+              <p style="font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#2563eb;margin:0 0 8px 0;">
+                QLYK STUDIO AUTO
+              </p>
+
+              <h1 style="margin:0;font-size:25px;line-height:1.3;color:#111111;">
+                Copie interne — livraison envoyée
+              </h1>
+
+              <p style="margin:14px 0 0 0;font-size:14px;line-height:1.7;color:#4b5563;">
+                Une livraison client vient d’être transmise automatiquement depuis l’interface QLYK.
+              </p>
+            </div>
+
+            <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:18px;padding:22px;margin-bottom:18px;">
+              <p style="margin:0 0 12px 0;color:#111111;">
+                <strong>Client :</strong> ${clientName}
+              </p>
+
+              <p style="margin:0 0 12px 0;color:#111111;">
+                <strong>Email client :</strong> ${email}
+              </p>
+
+              <p style="margin:0;color:#111111;">
+                <strong>Dossier :</strong> ${deliveryLabel}
+              </p>
+            </div>
+
+            <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:18px;padding:22px;margin-bottom:18px;">
+              <p style="margin:0 0 14px 0;color:#111111;">
+                <strong>Lien de livraison :</strong>
+              </p>
+
+              <a href="${deliveryUrl}" target="_blank" rel="noreferrer" style="color:#2563eb;text-decoration:underline;font-size:14px;word-break:break-all;">
+                ${deliveryUrl}
+              </a>
+            </div>
+
+            <p style="margin:24px 0 0 0;font-size:12px;line-height:1.6;color:#6b7280;text-align:center;">
+              QLYK Studio Auto — Copie automatique interne
+            </p>
+          </div>
+        </div>
+      `,
+    });
+
     return NextResponse.json({
       success: true,
-      message: "Email de livraison envoyé avec copie QLYK.",
+      message:
+        "Mail client envoyé avec succès. Copie interne envoyée à contact@qlykstudio.fr.",
     });
   } catch (error) {
     console.error("QLYK SEND DELIVERY EMAIL ERROR:", error);

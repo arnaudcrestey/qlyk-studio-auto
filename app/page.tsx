@@ -19,16 +19,24 @@ export default function HomePage() {
             </p>
 
             <h1 className="mt-9 font-light uppercase text-white">
-              <span className="hidden text-[3.6rem] tracking-[0.18em] sm:block lg:text-[4.6rem]">
-                QLYK Studio Auto
+              {/* Desktop */}
+              <span className="hidden sm:block">
+                <span className="block text-[3.6rem] tracking-[0.18em] lg:text-[4.6rem]">
+                  QLYK Studio
+                </span>
+
+                <span className="mt-2 block text-[2.1rem] tracking-[0.30em] text-white/90 lg:text-[2.6rem]">
+                  Auto
+                </span>
               </span>
 
+              {/* Mobile */}
               <span className="block sm:hidden">
-                <span className="block whitespace-nowrap text-[2rem] leading-none tracking-[0.11em]">
+                <span className="block whitespace-nowrap text-[2.25rem] leading-none tracking-[0.12em]">
                   QLYK STUDIO
                 </span>
 
-                <span className="mt-4 block text-[1.9rem] leading-none tracking-[0.22em]">
+                <span className="mt-3 block text-[1.55rem] leading-none tracking-[0.28em] text-white/90">
                   AUTO
                 </span>
               </span>
@@ -36,24 +44,27 @@ export default function HomePage() {
 
             <div className="mx-auto mt-10 h-px w-28 bg-gradient-to-r from-transparent via-blue-500 to-transparent" />
 
-            <h2 className="mx-auto mt-11 max-w-[760px] font-serif text-[1.8rem] leading-[1.12] tracking-[-0.04em] text-white sm:text-5xl lg:text-[4rem]">
-  <span className="sm:hidden">
-    Vos véhicules sont prêts
-    <br />
-    à vendre.
-  </span>
+            <h2 className="mx-auto mt-11 max-w-[760px] font-serif text-[1.9rem] leading-[1.1] tracking-[-0.04em] text-white sm:text-5xl lg:text-[4rem]">
+              <span className="sm:hidden">
+                Vos véhicules sont prêts
+                <br />
+                à vendre.
+              </span>
 
-  <span className="hidden sm:inline">
-    Vos véhicules sont prêts à vendre.
-  </span>
+              <span className="hidden sm:inline">
+                Vos véhicules sont prêts à vendre.
+              </span>
 
-  <span className="block text-white/60">
-    Leur décor, pas toujours.
-  </span>
-</h2>
+              <span className="mt-1 block text-white/60 sm:mt-0">
+                Leur décor,
+                <br className="sm:hidden" />
+                <span className="sm:hidden"> </span>
+                pas toujours.
+              </span>
+            </h2>
 
-            <p className="mx-auto mt-8 max-w-[580px] text-[1.05rem] leading-8 text-white/72 sm:text-base sm:leading-8">
-              Nous transformons l’environnement visuel de vos véhicules pour les
+            <p className="mx-auto mt-8 max-w-[520px] text-[1rem] leading-8 text-white/72 sm:max-w-[580px] sm:text-base sm:leading-8">
+              Nous optimisons l’environnement visuel de vos véhicules pour les
               présenter dans un cadre plus professionnel et plus vendeur.
             </p>
 

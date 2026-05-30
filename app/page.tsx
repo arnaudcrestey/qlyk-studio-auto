@@ -37,11 +37,20 @@ export default function HomePage() {
             <div className="mx-auto mt-10 h-px w-28 bg-gradient-to-r from-transparent via-blue-500 to-transparent" />
 
             <h2 className="mx-auto mt-11 max-w-[760px] font-serif text-[1.8rem] leading-[1.12] tracking-[-0.04em] text-white sm:text-5xl lg:text-[4rem]">
-              Vos véhicules sont prêts à vendre.
-              <span className="block text-white/60">
-                Leur décor, pas toujours.
-              </span>
-            </h2>
+  <span className="sm:hidden">
+    Vos véhicules sont prêts
+    <br />
+    à vendre.
+  </span>
+
+  <span className="hidden sm:inline">
+    Vos véhicules sont prêts à vendre.
+  </span>
+
+  <span className="block text-white/60">
+    Leur décor, pas toujours.
+  </span>
+</h2>
 
             <p className="mx-auto mt-8 max-w-[580px] text-[1.05rem] leading-8 text-white/72 sm:text-base sm:leading-8">
               Nous transformons l’environnement visuel de vos véhicules pour les

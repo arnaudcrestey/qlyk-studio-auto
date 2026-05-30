@@ -36,17 +36,14 @@ export default function HomePage() {
             </h2>
 
             <p className="mx-auto mt-7 max-w-[580px] text-sm leading-7 text-white/62 sm:text-base sm:leading-8">
-  Nous transformons l’environnement visuel de vos véhicules pour les
-  présenter dans un cadre plus professionnel et plus vendeur.
-</p>
+              Nous transformons l’environnement visuel de vos véhicules pour les
+              présenter dans un cadre plus professionnel et plus vendeur.
+            </p>
 
-<p className="mx-auto mt-4 text-sm font-medium text-blue-300/90">
-  — Sans jamais modifier le véhicule —
-</p>
             <div className="mt-10 flex justify-center">
               <Link
                 href="/accueil"
-                className="group inline-flex h-12 items-center justify-center gap-3 rounded-full bg-blue-600 px-8 text-sm font-semibold text-white shadow-[0_0_35px_rgba(37,99,235,0.45)] transition-all duration-300 hover:bg-blue-500 hover:shadow-[0_0_55px_rgba(37,99,235,0.75)]"
+                className="group inline-flex h-14 items-center justify-center gap-3 rounded-full bg-blue-600 px-10 text-sm font-semibold text-white shadow-[0_0_35px_rgba(37,99,235,0.45)] transition-all duration-300 hover:bg-blue-500 hover:shadow-[0_0_55px_rgba(37,99,235,0.75)]"
               >
                 Entrer
                 <span className="transition-transform duration-300 group-hover:translate-x-1">
@@ -55,19 +52,9 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="mx-auto mt-12 flex flex-wrap items-center justify-center gap-4 text-[0.65rem] font-medium uppercase tracking-[0.28em] text-white/45 sm:gap-6 sm:text-[0.72rem]">
-              <span className="whitespace-nowrap">Fidèle</span>
-
-              <span className="hidden h-1 w-1 rounded-full bg-blue-500 sm:block" />
-
-              <span className="whitespace-nowrap">Professionnel</span>
-
-              <span className="hidden h-1 w-1 rounded-full bg-blue-500 sm:block" />
-
-              <span className="whitespace-nowrap">
-                Sans modification
-              </span>
-            </div>
+            <p className="mx-auto mt-12 text-[0.72rem] font-medium uppercase tracking-[0.34em] text-white/46">
+              — Sans jamais modifier le véhicule —
+            </p>
           </div>
         </div>
       </section>

@@ -22,15 +22,15 @@ export default function HomePage() {
               Studio visuel automobile premium
             </p>
 
-            <h1>
-  <span className="hidden sm:inline">
+            <h1 className="mt-3 font-light uppercase text-white">
+  <span className="hidden text-[3.4rem] tracking-[0.18em] sm:block lg:text-[4.4rem]">
     QLYK Studio Auto
   </span>
 
-  <span className="sm:hidden">
-    QLYK Studio
+  <span className="block text-[2.9rem] leading-[1.12] tracking-[0.16em] sm:hidden">
+    QLYK
     <br />
-    Auto
+    Studio Auto
   </span>
 </h1>
 

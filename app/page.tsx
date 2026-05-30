@@ -21,19 +21,21 @@ export default function HomePage() {
             <p className="text-[0.65rem] font-medium uppercase tracking-[0.40em] text-blue-400 sm:text-xs">
               Studio visuel automobile premium
             </p>
-
-            <h1 className="mt-3 font-light uppercase text-white">
+<h1 className="mt-3 font-light uppercase text-white">
   <span className="hidden text-[3.4rem] tracking-[0.18em] sm:block lg:text-[4.4rem]">
     QLYK Studio Auto
   </span>
 
-  <span className="block text-[2.9rem] leading-[1.12] tracking-[0.16em] sm:hidden">
-    QLYK
-    <br />
-    Studio Auto
+  <span className="block sm:hidden">
+    <span className="block text-[2.8rem] tracking-[0.18em]">
+      QLYK Studio
+    </span>
+
+    <span className="mt-2 block text-[2rem] tracking-[0.22em]">
+      Auto
+    </span>
   </span>
 </h1>
-
             <div className="mx-auto mt-8 h-px w-28 bg-gradient-to-r from-transparent via-blue-500 to-transparent" />
 
             <h2 className="mx-auto mt-10 max-w-[760px] font-serif text-[2rem] leading-[1.08] tracking-[-0.04em] text-white sm:text-5xl lg:text-[4rem]">

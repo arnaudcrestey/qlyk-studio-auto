@@ -22,9 +22,17 @@ export default function HomePage() {
               Studio visuel automobile premium
             </p>
 
-            <h1 className="mt-8 text-[1.9rem] font-light uppercase tracking-[0.12em] text-white sm:text-[3.2rem] sm:tracking-[0.16em] lg:text-[4.3rem]">
-              QLYK Studio Auto
-            </h1>
+            <h1>
+  <span className="hidden sm:inline">
+    QLYK Studio Auto
+  </span>
+
+  <span className="sm:hidden">
+    QLYK Studio
+    <br />
+    Auto
+  </span>
+</h1>
 
             <div className="mx-auto mt-8 h-px w-28 bg-gradient-to-r from-transparent via-blue-500 to-transparent" />
 
@@ -52,9 +60,9 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <p className="mx-auto mt-12 text-[0.72rem] font-medium uppercase tracking-[0.34em] text-white/46">
-              — Sans jamais modifier le véhicule —
-            </p>
+            <p className="mx-auto mt-12 whitespace-nowrap text-[0.62rem] font-medium uppercase tracking-[0.18em] text-white/46 sm:text-[0.72rem] sm:tracking-[0.34em]">
+  — Sans jamais modifier le véhicule —
+</p>
           </div>
         </div>
       </section>

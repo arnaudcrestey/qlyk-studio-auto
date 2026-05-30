@@ -27,11 +27,11 @@ export default function HomePage() {
   </span>
 
   <span className="block sm:hidden">
-    <span className="block text-[2.8rem] tracking-[0.18em]">
+    <span className="block text-[3.05rem] leading-none tracking-[0.13em]">
       QLYK Studio
     </span>
 
-    <span className="mt-2 block text-[2rem] tracking-[0.22em]">
+    <span className="mt-5 block text-[2.35rem] leading-none tracking-[0.2em]">
       Auto
     </span>
   </span>

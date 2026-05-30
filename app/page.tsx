@@ -61,9 +61,18 @@ export default function HomePage() {
 </h2>
 
             <p className="mx-auto mt-8 max-w-[520px] text-[1rem] leading-8 text-white/72 sm:max-w-[580px] sm:text-base sm:leading-8">
-              Nous optimisons l’environnement visuel de vos véhicules pour les
-              présenter dans un cadre plus professionnel et plus vendeur.
-            </p>
+  <span className="sm:hidden">
+    Nous optimisons l’environnement visuel de vos véhicules pour les
+    présenter dans un cadre plus professionnel
+    <br />
+    et plus vendeur.
+  </span>
+
+  <span className="hidden sm:inline">
+    Nous optimisons l’environnement visuel de vos véhicules pour les
+    présenter dans un cadre plus professionnel et plus vendeur.
+  </span>
+</p>
 
             <div className="mt-12 flex justify-center">
               <Link

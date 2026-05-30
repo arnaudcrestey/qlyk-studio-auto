@@ -1,4 +1,4 @@
-import Link from "next/link";
+ import Link from "next/link";
 
 export default function HomePage() {
   return (
@@ -19,33 +19,36 @@ export default function HomePage() {
             </p>
 
             <h1 className="mt-9 font-light uppercase text-white">
-  {/* Desktop */}
-  <span className="hidden sm:block">
-    <span className="block text-[3.6rem] tracking-[0.18em] lg:text-[4.6rem]">
-      QLYK Studio
-    </span>
+              {/* Desktop */}
+              <span className="hidden sm:block">
+                <span className="block text-[3.6rem] tracking-[0.18em] lg:text-[4.6rem]">
+                  QLYK Studio
+                </span>
 
-    <span className="mt-2 block text-[2.1rem] tracking-[0.30em] text-white/90 lg:text-[2.6rem]">
-      Auto
-    </span>
-  </span>
+                <span className="mt-2 block text-[2.1rem] tracking-[0.30em] text-white/90 lg:text-[2.6rem]">
+                  Auto
+                </span>
+              </span>
 
-  {/* Mobile */}
-  <span className="block sm:hidden">
-    <span className="block whitespace-nowrap text-[2.25rem] leading-none tracking-[0.12em]">
-      QLYK STUDIO
-    </span>
+              {/* Mobile */}
+              <span className="block sm:hidden">
+                <span className="block whitespace-nowrap text-[2.25rem] leading-none tracking-[0.12em]">
+                  QLYK STUDIO
+                </span>
 
-    <span className="mt-3 block text-[1.55rem] leading-none tracking-[0.28em] text-white/90">
-      AUTO
-    </span>
-  </span>
-</h1>
+                <span className="mt-3 block text-[1.55rem] leading-none tracking-[0.28em] text-white/90">
+                  AUTO
+                </span>
+              </span>
+            </h1>
+
             <div className="mx-auto mt-10 h-px w-28 bg-gradient-to-r from-transparent via-blue-500 to-transparent" />
 
             <h2 className="mx-auto mt-11 max-w-[760px] font-serif text-[1.9rem] leading-[1.1] tracking-[-0.04em] text-white sm:text-5xl lg:text-[4rem]">
               <span className="sm:hidden">
-                Vos véhicules sont prêts à vendre.
+                Vos véhicules sont prêts
+                <br />
+                à vendre.
               </span>
 
               <span className="hidden sm:inline">
@@ -60,9 +63,9 @@ export default function HomePage() {
               </span>
             </h2>
 
-            <p className="mx-auto mt-8 max-w-[500px] text-[1rem] leading-8 text-white/72 sm:max-w-[580px] sm:text-base sm:leading-8">
-              Nous optimisons l’environnement visuel de vos véhicules sans jamais
-              modifier le véhicule.
+            <p className="mx-auto mt-8 max-w-[520px] text-[1rem] leading-8 text-white/72 sm:max-w-[580px] sm:text-base sm:leading-8">
+              Nous optimisons l’environnement visuel de vos véhicules pour les
+              présenter dans un cadre plus professionnel et plus vendeur.
             </p>
 
             <div className="mt-12 flex justify-center">

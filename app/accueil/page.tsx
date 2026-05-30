@@ -1,4 +1,4 @@
-```tsx
+
 import Link from 'next/link';
 import { HeroSection } from '@/components/hero-section';
 import { BeforeAfterSection } from '@/components/before-after-section';

@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
+import { SiteChrome } from "@/components/site-chrome";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
-
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
   variable: "--font-cormorant",
@@ -20,15 +17,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html lang="fr">
       <body
         className={`${inter.variable} ${cormorant.variable} bg-background text-foreground antialiased`}
       >
-        {children}
+        <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
   );

@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { CarFront, Menu, X } from 'lucide-react';
 
 const links = [
-  { label: 'Accueil', href: '/' as const },
+  { label: 'Accueil', href: '/accueil' as const },
   { label: 'Exemples', href: '/exemples' as const },
   { label: 'Offres', href: '/offres' as const },
   { label: 'Contact', href: '/contact' as const },
